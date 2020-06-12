@@ -136,6 +136,10 @@ public class Main {
         addEnvClassPath(env, ClassLoaderManager.getClassPath());
 
         JobExecutionResult result = env.execute(jobIdString);
+        LOG.info("numWrite: " + result.getAccumulatorResult("numWrite"));
+        LOG.info("numRead: " + result.getAccumulatorResult("numRead"));
+        LOG.info("nErrors: " + result.getAccumulatorResult("nErrors"));
+        LOG.info("TASK DONE");
         if(env instanceof MyLocalStreamEnvironment){
             ResultPrintUtil.printResult(result);
         }

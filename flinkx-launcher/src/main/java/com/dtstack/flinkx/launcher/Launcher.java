@@ -31,12 +31,14 @@ import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.PackagedProgram;
 import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
 import org.apache.flink.util.Preconditions;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -51,6 +53,8 @@ import java.util.List;
  */
 public class Launcher {
 
+    public static Logger LOG = LoggerFactory.getLogger(Launcher.class);
+
     public static final String KEY_FLINKX_HOME = "FLINKX_HOME";
     public static final String KEY_FLINK_HOME = "FLINK_HOME";
     public static final String KEY_HADOOP_HOME = "HADOOP_HOME";
@@ -63,8 +67,9 @@ public class Launcher {
 
         List<URL> urlList = new ArrayList<>();
 
-        String jobJson = readJob(content);
-        DataTransferConfig config = DataTransferConfig.parse(jobJson);
+//        String jobJson = readJob(content);
+//        DataTransferConfig config = DataTransferConfig.parse(jobJson);
+        DataTransferConfig config = DataTransferConfig.parse(content);
 
         Preconditions.checkNotNull(pluginRoot);
 
@@ -95,6 +100,9 @@ public class Launcher {
         String mode = launcherOptions.getMode();
         List<String> argList = optionParser.getProgramExeArgList();
         if(mode.equals(ClusterMode.local.name())) {
+            String name = ManagementFactory.getRuntimeMXBean().getName();
+            String pid = name.split("@")[0];
+            LOG.info("#PID={}#", pid);
             String[] localArgs = argList.toArray(new String[argList.size()]);
             com.dtstack.flinkx.Main.main(localArgs);
         } else {

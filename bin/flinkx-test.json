@@ -1,0 +1,69 @@
+{
+	"job": {
+		"content": [
+			{
+				"reader": {
+					"parameter": {
+						"username": "merce",
+						"password": "merce",
+						"connection": [
+							{
+								"jdbcUrl": [
+									"jdbc:mysql://192.168.1.75:3306/merce?characterEncoding=utf8&useSSL=false"
+								],
+								"table": [
+									"sink_jdbc_0108"
+								]
+							}
+						],
+						"column": [
+							"NAME",
+							"JOB",
+							"count",
+							"avg"
+						]
+					},
+					"name": "mysqlreader"
+				},
+				"writer": {
+					"name": "mysqlwriter",
+					"parameter": {
+						"username": "merce",
+						"password": "merce",
+						"connection": [
+							{
+								"jdbcUrl":"jdbc:mysql://192.168.1.75:3306/merce?characterEncoding=utf8&useSSL=false",
+								"table": [
+									"flinkx_sink_test"
+								]
+							}
+						],
+						"preSql": [
+							"truncate table flinkx_sink_test;"
+						],
+						"writeMode": "insert",
+						"column": [
+							"NAME",
+							"JOB",
+							"count",
+							"avg"
+						],
+						"batchSize": 1024
+					}
+				}
+			}
+		],
+		"setting": {
+			"restore": {
+				"isRestore": false,
+				"isStream": false
+			},
+			"errorLimit": {},
+			"speed": {
+				"bytes": 0,
+				"channel": 1,
+				"rebalance": true
+			}
+		}
+	}
+}

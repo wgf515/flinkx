@@ -8,4 +8,5 @@ jobs/
 nohup.out
 flinkconf/
 hadoopconf/
+syncplugins/
 /default_task_id_output

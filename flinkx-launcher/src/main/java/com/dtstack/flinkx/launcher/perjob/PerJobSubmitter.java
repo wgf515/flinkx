@@ -86,9 +86,11 @@ public class PerJobSubmitter {
         perJobClusterClientBuilder.init(yarnConf, flinkConfig, conProp);
 
         AbstractYarnClusterDescriptor descriptor = perJobClusterClientBuilder.createPerJobClusterDescriptor(options);
-        ClusterClient<ApplicationId> clusterClient = descriptor.deployJobCluster(clusterSpecification, new JobGraph(), true);
+        JobGraph jobGraph = new JobGraph();
+        ClusterClient<ApplicationId> clusterClient = descriptor.deployJobCluster(clusterSpecification, jobGraph, true);
         String applicationId = clusterClient.getClusterId().toString();
-        LOG.info("deploy per_job with appId: {}", applicationId);
+        String jobId = jobGraph.getJobID().toString();
+        LOG.info("deploy per_job with appId: {}, jobId: {}", applicationId, jobId);
         return applicationId;
     }
 }

@@ -158,7 +158,7 @@ public class JdbcDataReader extends BaseDataReader {
                     if(metaColumn.getName().equals(incrementColStr)){
                         type = metaColumn.getType();
                         name = metaColumn.getName();
-                        index = metaColumn.getIndex();
+                        index = metaColumn.getIndex() == null ? index : metaColumn.getIndex();
                         break;
                     }
                 }
@@ -174,9 +174,9 @@ public class JdbcDataReader extends BaseDataReader {
             incrementConfig.setRequestAccumulatorInterval(requestAccumulatorInterval);
             incrementConfig.setPollingInterval(pollingInterval);
 
-            if (type == null || name == null){
-                throw new IllegalArgumentException("There is no " + incrementColStr +" field in the columns");
-            }
+//            if (type == null || name == null){
+//                throw new IllegalArgumentException("There is no " + incrementColStr +" field in the columns");
+//            }
         }
     }
 

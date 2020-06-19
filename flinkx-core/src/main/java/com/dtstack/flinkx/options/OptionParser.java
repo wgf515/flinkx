@@ -19,11 +19,14 @@
 package com.dtstack.flinkx.options;
 
 import com.dtstack.flinkx.util.MapUtil;
+import com.google.common.base.Charsets;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

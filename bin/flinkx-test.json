@@ -3,66 +3,105 @@
 		"content": [
 			{
 				"reader": {
+					"name": "oraclereader",
 					"parameter": {
-						"username": "merce",
-						"password": "merce",
+						"username": "carpo",
+						"password": "123456",
 						"connection": [
 							{
 								"jdbcUrl": [
-									"jdbc:mysql://192.168.1.75:3306/merce?characterEncoding=utf8&useSSL=false"
+									"jdbc:oracle:thin:@192.168.1.83:1521:orcl"
 								],
 								"table": [
-									"sink_jdbc_0108"
+									"ORACLE_ORACLE2"
 								]
 							}
 						],
 						"column": [
-							"NAME",
-							"JOB",
-							"count",
-							"avg"
-						]
-					},
-					"name": "mysqlreader"
+							{
+								"name": "NAME",
+								"type": "string"
+							},
+							{
+								"name": "JOB",
+								"type": "string"
+							},
+							{
+								"name": "SALARY",
+								"type": "double"
+							},
+							{
+								"name": "AGE",
+								"type": "double"
+							},
+							{
+								"name": "GENDER",
+								"type": "string"
+							},
+							{
+								"name": "TIME",
+								"type": "timestamp"
+							}
+						],
+						"where": "",
+						"queryTimeOut": 5000,
+						"fetchSize": 1000
+					}
 				},
 				"writer": {
-					"name": "mysqlwriter",
+					"name": "hdfswriter",
 					"parameter": {
-						"username": "merce",
-						"password": "merce",
-						"connection": [
+						"defaultFS": "hdfs://info1:8020",
+						"path": "/tmp/wgf/test_flink",
+						"fileType": "text",
+						"column": [
 							{
-								"jdbcUrl":"jdbc:mysql://192.168.1.75:3306/merce?characterEncoding=utf8&useSSL=false",
-								"table": [
-									"flinkx_sink_test"
-								]
+								"name": "NAME",
+								"type": "string"
+							},
+							{
+								"name": "JOB",
+								"type": "string"
+							},
+							{
+								"name": "SALARY",
+								"type": "double"
+							},
+							{
+								"name": "AGE",
+								"type": "double"
+							},
+							{
+								"name": "GENDER",
+								"type": "string"
+							},
+							{
+								"name": "TIME",
+								"type": "date"
 							}
 						],
-						"preSql": [
-							"truncate table flinkx_sink_test;"
-						],
-						"writeMode": "insert",
-						"column": [
-							"NAME",
-							"JOB",
-							"count",
-							"avg"
-						],
-						"batchSize": 1024
+						"writeMode": "overwrite",
+						"fieldDelimiter": ",",
+						"maxFileSize": 1073741824
 					}
 				}
 			}
 		],
 		"setting": {
 			"restore": {
-				"isRestore": false,
-				"isStream": false
+				"isRestore": true,
+				"isStream": false,
+				"restoreColumnName": "SALARY",
+				"maxRowNumForCheckpoint": 1
 			},
-			"errorLimit": {},
+			"log": {
+				"isLogger": false,
+				"level": "info",
+				"path": "/tmp/dtstack/flinkx/"
+			},
 			"speed": {
-				"bytes": 0,
 				"channel": 1,
-				"rebalance": true
+				"bytes": 9223372036854775807
 			}
 		}
 	}

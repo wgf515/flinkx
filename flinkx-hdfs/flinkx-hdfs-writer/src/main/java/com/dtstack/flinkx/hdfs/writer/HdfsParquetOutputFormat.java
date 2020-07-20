@@ -112,9 +112,9 @@ public class HdfsParquetOutputFormat extends BaseHdfsOutputFormat {
 
     private CompressionCodecName getCompressType(){
         // Compatible with old code
-        if(StringUtils.isEmpty(compress)){
-            compress = ECompressType.PARQUET_SNAPPY.getType();
-        }
+//        if(StringUtils.isEmpty(compress)){
+//            compress = ECompressType.PARQUET_SNAPPY.getType();
+//        }
 
         ECompressType compressType = ECompressType.getByTypeAndFileType(compress, "parquet");
         if(ECompressType.PARQUET_SNAPPY.equals(compressType)){

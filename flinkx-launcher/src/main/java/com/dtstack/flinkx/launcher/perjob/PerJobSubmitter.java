@@ -32,6 +32,7 @@ import org.apache.flink.runtime.client.JobStatusMessage;
 import org.apache.flink.runtime.jobgraph.JobGraph;
 import org.apache.flink.runtime.jobgraph.JobStatus;
 import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
+import org.apache.flink.util.FlinkException;
 import org.apache.flink.util.OptionalFailure;
 import org.apache.flink.yarn.AbstractYarnClusterDescriptor;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
@@ -107,9 +108,10 @@ public class PerJobSubmitter {
             Thread.sleep(10000);
         }
         Map<String, OptionalFailure<Object>> map = clusterClient.getAccumulators(jobId);
-        LOG.info("numRead: " + map.get("numRead").get());
-        LOG.info("numWrite: " + map.get("numWrite").get());
-        LOG.info("nErrors: " + map.get("nErrors").get());
+        for (Map.Entry<String, OptionalFailure<Object>> entry : map.entrySet()) {
+            LOG.info(entry.getKey() + ": " + entry.getValue().get());
+        }
+
         if ("FINISHED".equals(finalStatus)) {
             LOG.info("TASK DONE");
         }

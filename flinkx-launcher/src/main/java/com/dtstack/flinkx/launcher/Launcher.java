@@ -67,9 +67,9 @@ public class Launcher {
 
         List<URL> urlList = new ArrayList<>();
 
-//        String jobJson = readJob(content);
-//        DataTransferConfig config = DataTransferConfig.parse(jobJson);
-        DataTransferConfig config = DataTransferConfig.parse(content);
+        String jobJson = readJob(content);
+        DataTransferConfig config = DataTransferConfig.parse(jobJson);
+//        DataTransferConfig config = DataTransferConfig.parse(content);
 
         Preconditions.checkNotNull(pluginRoot);
 
@@ -103,7 +103,7 @@ public class Launcher {
             String name = ManagementFactory.getRuntimeMXBean().getName();
             String pid = name.split("@")[0];
             LOG.info("#PID={}#", pid);
-            String[] localArgs = argList.toArray(new String[argList.size()]);
+            String[] localArgs = argList.toArray(new String[0]);
             com.dtstack.flinkx.Main.main(localArgs);
         } else {
             String pluginRoot = launcherOptions.getPluginRoot();

@@ -38,6 +38,7 @@ import org.apache.flink.client.program.ContextEnvironment;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.GlobalConfiguration;
 import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
+import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
@@ -136,9 +137,8 @@ public class Main {
         addEnvClassPath(env, ClassLoaderManager.getClassPath());
 
         JobExecutionResult result = env.execute(jobIdString);
-        LOG.info("numWrite: " + result.getAccumulatorResult("numWrite"));
-        LOG.info("numRead: " + result.getAccumulatorResult("numRead"));
-        LOG.info("nErrors: " + result.getAccumulatorResult("nErrors"));
+        result.getAllAccumulatorResults().forEach((name, val) -> LOG.info(name + ": " + val));
+
         LOG.info("TASK DONE");
         if(env instanceof MyLocalStreamEnvironment){
             ResultPrintUtil.printResult(result);
@@ -258,6 +258,13 @@ public class Main {
             env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
             env.getCheckpointConfig().enableExternalizedCheckpoints(
                     CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
+
+//            env.setStateBackend(new FsStateBackend("file:///D:\\checkpoint", true));
+
+            String path = properties.getProperty(ConfigConstant.FLINK_CHECKPOINT_PATH_KEY);
+            if (StringUtils.isNotBlank(path)) {
+                env.setStateBackend(new FsStateBackend(path, true));
+            }
         }
         return env;
     }

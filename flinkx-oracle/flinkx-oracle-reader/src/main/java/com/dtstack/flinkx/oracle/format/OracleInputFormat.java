@@ -74,8 +74,8 @@ public class OracleInputFormat extends JdbcInputFormat {
         ts.setNanos(DbUtil.getNanos(location));
         timeStr = DbUtil.getNanosTimeStr(ts.toString());
 
-        if(ColumnType.TIMESTAMP.name().equals(incrementColType)){
-            timeStr = String.format("TO_TIMESTAMP('%s','YYYY-MM-DD HH24:MI:SS:FF6')",timeStr);
+        if(ColumnType.TIMESTAMP.name().toLowerCase().equals(incrementColType.toLowerCase())){
+            timeStr = String.format("TO_TIMESTAMP('%s','YYYY-MM-DD HH24:MI:SS:FF9')",timeStr);
         } else {
             timeStr = timeStr.substring(0, 19);
             timeStr = String.format("TO_DATE('%s','YYYY-MM-DD HH24:MI:SS')", timeStr);

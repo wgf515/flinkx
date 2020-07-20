@@ -37,7 +37,7 @@ import java.text.SimpleDateFormat;
  */
 public class HdfsUtil {
 
-    public static final String NULL_VALUE = "\\N";
+    public static final String NULL_VALUE = "";
 
     public static Object string2col(String str, String type, SimpleDateFormat customDateFormat) {
         if (str == null || str.length() == 0){

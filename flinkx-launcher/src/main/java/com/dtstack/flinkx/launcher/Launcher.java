@@ -25,6 +25,7 @@ import com.dtstack.flinkx.enums.ClusterMode;
 import com.dtstack.flinkx.launcher.perjob.PerJobSubmitter;
 import com.dtstack.flinkx.options.OptionParser;
 import com.dtstack.flinkx.options.Options;
+import com.dtstack.flinkx.util.JsonModifyUtil;
 import com.dtstack.flinkx.util.SysUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.client.program.ClusterClient;
@@ -43,6 +44,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -99,6 +101,23 @@ public class Launcher {
 
         String mode = launcherOptions.getMode();
         List<String> argList = optionParser.getProgramExeArgList();
+
+        // 将argList转化为HashMap，方便通过参数名称来获取参数值
+        HashMap<String, String> temp = new HashMap<>(16);
+        for (int i = 0; i < argList.size(); i += 2) {
+            temp.put(argList.get(i), argList.get(i + 1));
+        }
+        // 对json中的值进行修改
+        HashMap<String, String> parameter = JsonModifyUtil.CommandTransform(temp.get("-p"));
+        temp.put("-job", JsonModifyUtil.JsonValueReplace(temp.get("-job"), parameter));
+
+        // 清空list，填充修改后的参数值
+        argList.clear();
+        for (int i = 0; i < temp.size(); i++) {
+            argList.add(temp.keySet().toArray()[i].toString());
+            argList.add(temp.values().toArray()[i].toString());
+        }
+
         if(mode.equals(ClusterMode.local.name())) {
             String name = ManagementFactory.getRuntimeMXBean().getName();
             String pid = name.split("@")[0];
@@ -245,9 +264,8 @@ public class Launcher {
     }
 
     private static String readJob(String job) {
-        try {
-            File file = new File(job);
-            FileInputStream in = new FileInputStream(file);
+        File file = new File(job);
+        try (FileInputStream in = new FileInputStream(file)) {
             byte[] fileContent = new byte[(int) file.length()];
             in.read(fileContent);
             in.close();

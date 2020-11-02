@@ -51,7 +51,7 @@ public class FunctionTree {
                 subTaskVal.add(inputFunction.evaluate(nameValueMap));
             }
 
-            return function.evaluate(StringUtils.join(subTaskVal, "_"));
+            return function.evaluate(StringUtils.join(subTaskVal, ""));
         } else {
             return function.evaluate(null);
         }

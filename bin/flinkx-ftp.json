@@ -1,0 +1,95 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "ftpreader",
+                    "parameter": {
+                        "username": "europa",
+                        "password": "europa",
+                        "protocol": "ftp",
+                        "host": "info4",
+                        "port": 21,
+                        "path": "ftp_wgf",
+                        "fieldDelimiter": ",",
+                        "isFirstLineHeader": false,
+                        "column": [
+                            {
+                                "index": 0,
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "index": 1,
+                                "name": "sex",
+                                "type": "string"
+                            },
+                            {
+                                "index": 2,
+                                "name": "age",
+                                "type": "int"
+                            }
+                        ]
+                    }
+                },
+                "writer": {
+                    "name": "hdfswriter",
+                    "parameter": {
+                        "defaultFS": "hdfs://info1:8020",
+                        "path": "/tmp/wgf/ftp2hdfs",
+                        "fileType": "text",
+                        "writeMode": "overwrite",
+                        "fieldDelimiter": ",",
+                        "maxFileSize": 1073741824,
+                        "column": [
+                            {
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "name": "sex",
+                                "type": "string"
+                            },
+                            {
+                                "name": "age",
+                                "type": "int"
+                            }
+                        ],
+                        "encrypt": [
+                            {
+                                "name": "name",
+                                "type": "BLANK"
+                            },
+                            {
+                                "name": "sex"
+                            },
+                            {
+                                "name": "age"
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "setting": {
+            "restore": {
+                "isRestore": false,
+                "isStream": false,
+                "maxRowNumForCheckpoint": 1
+            },
+            "log": {
+                "isLogger": false,
+                "level": "info",
+                "path": "/tmp/dtstack/flinkx/"
+            },
+            "speed": {
+                "channel": 1,
+                "bytes": 9223372036854775807
+            },
+            "errorLimit": {
+                "record": 0,
+                "percentage": 0.0
+            }
+        }
+    }
+}

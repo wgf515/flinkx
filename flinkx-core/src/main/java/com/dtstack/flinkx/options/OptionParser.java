@@ -101,14 +101,14 @@ public class OptionParser {
             if(value == null) {
                 continue;
             }
-            else if(OPTION_JOB.equalsIgnoreCase(key)){
-                File file = new File(value.toString());
-                try (FileInputStream in = new FileInputStream(file)) {
-                    byte[] filecontent = new byte[(int) file.length()];
-                    in.read(filecontent);
-                    value = new String(filecontent, Charsets.UTF_8.name());
-                }
-            }
+//            else if(OPTION_JOB.equalsIgnoreCase(key)){
+//                File file = new File(value.toString());
+//                try (FileInputStream in = new FileInputStream(file)) {
+//                    byte[] filecontent = new byte[(int) file.length()];
+//                    in.read(filecontent);
+//                    value = new String(filecontent, Charsets.UTF_8.name());
+//                }
+//            }
             args.add("-" + key);
             args.add(value.toString());
         }

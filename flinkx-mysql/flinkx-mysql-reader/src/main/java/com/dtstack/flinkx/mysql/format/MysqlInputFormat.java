@@ -28,7 +28,10 @@ import org.apache.flink.core.io.InputSplit;
 import org.apache.flink.types.Row;
 
 import java.io.IOException;
+import java.sql.Clob;
+import java.sql.NClob;
 import java.sql.SQLException;
+import java.util.List;
 
 import static com.dtstack.flinkx.rdb.util.DbUtil.clobToString;
 
@@ -39,6 +42,7 @@ import static com.dtstack.flinkx.rdb.util.DbUtil.clobToString;
  * @author tudou
  */
 public class MysqlInputFormat extends JdbcInputFormat {
+    private List<Integer> columnTypeList;
 
     @Override
     public void openInternal(InputSplit inputSplit) throws IOException {
@@ -58,7 +62,7 @@ public class MysqlInputFormat extends JdbcInputFormat {
                 getMaxValue(inputSplit);
             }
 
-            if(!canReadData(inputSplit)){
+            if (!canReadData(inputSplit)) {
                 LOG.warn("Not read data when the start location are equal to end location");
                 hasNext = false;
                 return;
@@ -72,11 +76,12 @@ public class MysqlInputFormat extends JdbcInputFormat {
             executeQuery(startLocation);
             columnCount = resultSet.getMetaData().getColumnCount();
             boolean splitWithRowCol = numPartitions > 1 && StringUtils.isNotEmpty(splitKey) && splitKey.contains("(");
-            if(splitWithRowCol){
-                columnCount = columnCount-1;
+            if (splitWithRowCol) {
+                columnCount = columnCount - 1;
             }
             checkSize(columnCount, metaColumns);
             descColumnTypeList = DbUtil.analyzeColumnType(resultSet);
+            columnTypeList = DbUtil.analyzeColumn(resultSet);
 
         } catch (SQLException se) {
             throw new IllegalArgumentException("open() failed. " + se.getMessage(), se);
@@ -95,26 +100,31 @@ public class MysqlInputFormat extends JdbcInputFormat {
         try {
             for (int pos = 0; pos < row.getArity(); pos++) {
                 Object obj = resultSet.getObject(pos + 1);
-                if(obj != null) {
-                    if(CollectionUtils.isNotEmpty(descColumnTypeList)) {
+                if (obj != null) {
+                    if (DbUtil.isBinaryType(columnTypeList.get(pos))) {
+                        obj = resultSet.getBytes(pos + 1);
+                    } else if (DbUtil.isClobType(columnTypeList.get(pos))) {
+                        Clob clob = resultSet.getClob(pos + 1);
+                        obj = clob.getSubString(1, (int) clob.length());
+                    } else if (DbUtil.isNclobType(columnTypeList.get(pos))) {
+                        NClob nClob = resultSet.getNClob(pos + 1);
+                        obj = nClob.getSubString(1, (int) nClob.length());
+                    } else if (CollectionUtils.isNotEmpty(descColumnTypeList)) {
                         String columnType = descColumnTypeList.get(pos);
-                        if("year".equalsIgnoreCase(columnType)) {
+                        if ("year".equalsIgnoreCase(columnType)) {
                             java.util.Date date = (java.util.Date) obj;
                             obj = DateUtil.dateToYearString(date);
-                        } else if("tinyint".equalsIgnoreCase(columnType)
-                                    || "bit".equalsIgnoreCase(columnType)) {
-                            if(obj instanceof Boolean) {
+                        } else if ("tinyint".equalsIgnoreCase(columnType) || "bit".equalsIgnoreCase(columnType)) {
+                            if (obj instanceof Boolean) {
                                 obj = ((Boolean) obj ? 1 : 0);
                             }
                         }
                     }
-                    obj = clobToString(obj);
                 }
-
                 row.setField(pos, obj);
             }
             return super.nextRecordInternal(row);
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new IOException("Couldn't read data - " + e.getMessage(), e);
         }
     }

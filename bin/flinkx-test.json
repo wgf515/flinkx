@@ -5,7 +5,7 @@
 				"reader": {
 					"name": "oraclereader",
 					"parameter": {
-						"username": "carpo",
+						"username": "CARPO",
 						"password": "123456",
 						"connection": [
 							{
@@ -13,88 +13,98 @@
 									"jdbc:oracle:thin:@192.168.1.83:1521:orcl"
 								],
 								"table": [
-									"ORACLE_ORACLE2_copy1"
+									"ORACLE_ORACLE2"
 								]
 							}
 						],
+						"where": "",
+						"queryTimeOut": 0,
+						"increColumn": "",
+						"splitPk": "",
+						"fetchSize": 0,
 						"column": [
 							{
-								"name": "GENDER",
+								"name": "NAME",
 								"type": "string"
-							},
-							{
-								"name": "SALARY",
-								"type": "double"
 							},
 							{
 								"name": "JOB",
 								"type": "string"
 							},
 							{
-								"name": "ID",
+								"name": "SALARY",
 								"type": "int"
+							},
+							{
+								"name": "AGE",
+								"type": "bigint"
+							},
+							{
+								"name": "GENDER",
+								"type": "string"
 							},
 							{
 								"name": "TIME",
 								"type": "timestamp"
-							},
-							{
-								"name": "AGE",
-								"type": "double"
-							},
-							{
-								"name": "NAME",
-								"type": "string"
 							}
-						],
-						"where": "",
-						"queryTimeOut": 0,
-						"splitPk": "ID",
-						"increColumn": "TIME",
-						"startLocation": "1583304252000000",
-						"requestAccumulatorInterval": 2,
-						"fetchSize": 0
+						]
 					}
 				},
 				"writer": {
 					"name": "hdfswriter",
 					"parameter": {
 						"defaultFS": "hdfs://info1:8020",
-						"path": "/tmp/wgf/flinkx_test_inc",
+						"path": "/tmp/collecter/c2/oracle_info3_713/ORACLE_ORACLE2_oracle_info3_713",
 						"fileType": "text",
+						"writeMode": "overwrite",
+						"fieldDelimiter": ",",
+						"maxFileSize": 1073741824,
 						"column": [
 							{
-								"name": "GENDER",
+								"name": "NAME",
 								"type": "string"
-							},
-							{
-								"name": "SALARY",
-								"type": "double"
 							},
 							{
 								"name": "JOB",
 								"type": "string"
 							},
 							{
-								"name": "ID",
+								"name": "SALARY",
 								"type": "int"
 							},
 							{
-								"name": "TIME",
-								"type": "date"
-							},
-							{
 								"name": "AGE",
-								"type": "double"
+								"type": "bigint"
 							},
 							{
-								"name": "NAME",
+								"name": "GENDER",
 								"type": "string"
+							},
+							{
+								"name": "TIME",
+								"type": "timestamp"
 							}
 						],
-						"writeMode": "append",
-						"fieldDelimiter": ",",
-						"maxFileSize": 1073741824
+						"encrypt": [
+							{
+								"name": "NAME"
+							},
+							{
+								"name": "JOB"
+							},
+							{
+								"name": "SALARY"
+							},
+							{
+								"name": "AGE"
+							},
+							{
+								"name": "GENDER"
+							},
+							{
+								"name": "TIME"
+							}
+						]
 					}
 				}
 			}
@@ -103,7 +113,7 @@
 			"restore": {
 				"isRestore": false,
 				"isStream": false,
-				"restoreColumnName": "ID",
+				"restoreColumnName": "AGE",
 				"maxRowNumForCheckpoint": 1
 			},
 			"log": {
@@ -112,7 +122,7 @@
 				"path": "/tmp/dtstack/flinkx/"
 			},
 			"speed": {
-				"channel": 2,
+				"channel": 1,
 				"bytes": 9223372036854775807
 			},
 			"errorLimit": {

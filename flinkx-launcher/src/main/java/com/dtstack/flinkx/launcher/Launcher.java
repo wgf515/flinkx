@@ -69,9 +69,9 @@ public class Launcher {
 
         List<URL> urlList = new ArrayList<>();
 
-        String jobJson = readJob(content);
-        DataTransferConfig config = DataTransferConfig.parse(jobJson);
-//        DataTransferConfig config = DataTransferConfig.parse(content);
+//        String jobJson = readJob(content);
+//        DataTransferConfig config = DataTransferConfig.parse(jobJson);
+        DataTransferConfig config = DataTransferConfig.parse(content);
 
         Preconditions.checkNotNull(pluginRoot);
 

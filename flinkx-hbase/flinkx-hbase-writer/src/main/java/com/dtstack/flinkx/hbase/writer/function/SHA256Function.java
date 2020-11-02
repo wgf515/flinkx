@@ -16,41 +16,19 @@
  * limitations under the License.
  */
 
-package com.dtstack.flinkx.stream.writer;
+package com.dtstack.flinkx.hbase.writer.function;
 
-import com.dtstack.flinkx.outputformat.BaseRichOutputFormatBuilder;
-import com.dtstack.flinkx.reader.MetaColumn;
-
-import java.util.List;
+import com.dtstack.flinkx.util.SHA256Util;
 
 /**
- * The builder of StreamOutputFormat
- *
- * @author jiangbo
- * @Company: www.dtstack.com
+ * @company: www.dtstack.com
+ * @author: toutian
+ * @create: 2019/7/23
  */
-public class StreamOutputFormatBuilder extends BaseRichOutputFormatBuilder {
-
-    private StreamOutputFormat format;
-
-    public StreamOutputFormatBuilder() {
-        super.format = format = new StreamOutputFormat();
-    }
-
-    public void setPrint(boolean print) {
-        format.print = print;
-    }
-
-    public void setMetaColumn(List<MetaColumn> metaColumns) {
-        format.metaColumns = metaColumns;
-    }
-
-    public void setWriteDelimiter(String writeDelimiter) {
-        format.writeDelimiter = writeDelimiter;
-    }
+public class SHA256Function implements IFunction {
 
     @Override
-    protected void checkFormat() {
-
+    public String evaluate(Object str) throws Exception {
+        return SHA256Util.getSHA256Str(str.toString());
     }
 }

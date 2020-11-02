@@ -265,27 +265,29 @@ public abstract class BaseHdfsOutputFormat extends BaseFileOutputFormat {
     @Override
     protected void waitForAllTasksToFinish() throws IOException{
         Path finishedDir = new Path(outputFilePath + SP + FINISHED_SUBDIR);
-        final int maxRetryTime = 100;
-        int i = 0;
-        for(; i < maxRetryTime; ++i) {
-            if(fs.listStatus(finishedDir).length == numTasks) {
-                break;
-            }
-            SysUtil.sleep(3000);
-        }
-
-        if (i == maxRetryTime) {
-            String subTaskDataPath = outputFilePath + SP + DATA_SUBDIR;
-            fs.delete(new Path(subTaskDataPath), true);
-            LOG.info("waitForAllTasksToFinish: delete path:[{}]", subTaskDataPath);
-
-            fs.delete(finishedDir, true);
-            LOG.info("waitForAllTasksToFinish: delete finished dir:[{}]", finishedDir);
-
-            throw new RuntimeException("timeout when gathering finish tags for each subtasks");
+//        final int maxRetryTime = 1000;
+//        int i = 0;
+//        for(; i < maxRetryTime; ++i) {
+//            if(fs.listStatus(finishedDir).length == numTasks) {
+//                break;
+//            }
+//            SysUtil.sleep(3000);
+//        }
+//
+//        if (i == maxRetryTime) {
+//            String subTaskDataPath = outputFilePath + SP + DATA_SUBDIR;
+//            fs.delete(new Path(subTaskDataPath), true);
+//            LOG.info("waitForAllTasksToFinish: delete path:[{}]", subTaskDataPath);
+//
+//            fs.delete(finishedDir, true);
+//            LOG.info("waitForAllTasksToFinish: delete finished dir:[{}]", finishedDir);
+//
+//            throw new RuntimeException("timeout when gathering finish tags for each subtasks");
+//        }
+        while (fs.listStatus(finishedDir).length != numTasks) {
+            SysUtil.sleep(10000);
         }
     }
-
     @Override
     protected void coverageData() throws IOException{
         LOG.info("Overwrite the original data");

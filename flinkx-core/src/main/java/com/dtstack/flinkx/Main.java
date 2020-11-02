@@ -25,6 +25,8 @@ import com.dtstack.flinkx.constants.ConfigConstant;
 import com.dtstack.flinkx.options.OptionParser;
 import com.dtstack.flinkx.reader.BaseDataReader;
 import com.dtstack.flinkx.reader.DataReaderFactory;
+import com.dtstack.flinkx.udf.UserDefinedFunctionRegistry;
+import com.dtstack.flinkx.util.ConvertUtil;
 import com.dtstack.flinkx.util.ResultPrintUtil;
 import com.dtstack.flinkx.writer.BaseDataWriter;
 import com.dtstack.flinkx.writer.DataWriterFactory;
@@ -32,8 +34,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.time.Time;
+import org.apache.flink.api.java.typeutils.GenericTypeInfo;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.client.program.ContextEnvironment;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.GlobalConfiguration;
@@ -43,9 +48,11 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamContextEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +65,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The main class entry
- *
+ * <p>
  * Company: www.dtstack.com
+ *
  * @author huyifan.zju@163.com
  */
 public class Main {
@@ -88,11 +96,11 @@ public class Main {
         DataTransferConfig config = DataTransferConfig.parse(job);
         speedTest(config);
 
-        if(StringUtils.isNotEmpty(monitor)) {
+        if (StringUtils.isNotEmpty(monitor)) {
             config.setMonitorUrls(monitor);
         }
 
-        if(StringUtils.isNotEmpty(pluginRoot)) {
+        if (StringUtils.isNotEmpty(pluginRoot)) {
             config.setPluginRoot(pluginRoot);
         }
 
@@ -112,9 +120,15 @@ public class Main {
 
         env.setParallelism(speedConfig.getChannel());
         env.setRestartStrategy(RestartStrategies.noRestart());
+
+        //注册udf
+        StreamTableEnvironment tableContext = StreamTableEnvironment.create(env);
+        UserDefinedFunctionRegistry udfRegistry = new UserDefinedFunctionRegistry(tableContext);
+        udfRegistry.registerInternalUDFs();
+
         BaseDataReader dataReader = DataReaderFactory.getDataReader(config, env);
         DataStream<Row> dataStream = dataReader.readData();
-        if(speedConfig.getReaderChannel() > 0){
+        if (speedConfig.getReaderChannel() > 0) {
             dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
         }
 
@@ -122,14 +136,56 @@ public class Main {
             dataStream = dataStream.rebalance();
         }
 
+        /*数据处理*/
+
+        String tableName = "tmpTable";
+        List<String> fields = new ArrayList<>();
+        //获取字段处理方法
+        List<Map<String, String>> mapList = (List<Map<String, String>>) config.getJob().getContent().get(0).getWriter().getParameter().getVal("encrypt");
+
+        if (mapList == null || mapList.size() == 0) {
+            return;
+        }
+
+        //构造sql
+        StringBuilder sb = new StringBuilder("SELECT ");
+        for (Map<String, String> map : mapList) {
+            fields.add(map.get("name"));
+            if (StringUtils.isNotBlank(map.get("type"))) {
+                if (StringUtils.isNotBlank(map.get("key"))) {
+                    sb.append(map.get("type") + "(`" + map.get("name") + "`, '" + map.get("key") + "')");
+                } else {
+                    sb.append(map.get("type") + "(`" + map.get("name") + "`)");
+                }
+            } else {
+                sb.append("`" + map.get("name") + "`");
+            }
+            sb.append(" AS `" + map.get("name") + "`,");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append(" FROM ").append(tableName);
+
+        LOG.info("sql is:" + sb.toString());
+
+        List<Map<String, String>> columns = config.getJob().getContent().get(0).getWriter().getParameter().getColumn();
+        RowTypeInfo rowTypeInfo = ConvertUtil.buildRowTypeInfo(columns);
+
+        SingleOutputStreamOperator<Row> streamOperator = dataStream.map((MapFunction<Row, Row>) row -> row).returns(rowTypeInfo);
+
+        //生成临时表
+        tableContext.registerDataStream(tableName, streamOperator, StringUtils.join(fields, ","));
+
+        //数据处理
+        DataStream<Row> dataStream1 = tableContext.toAppendStream(tableContext.sqlQuery(sb.toString()), Row.class);
+
         BaseDataWriter dataWriter = DataWriterFactory.getDataWriter(config);
-        DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream);
-        if(speedConfig.getWriterChannel() > 0){
+        DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream1);
+        if (speedConfig.getWriterChannel() > 0) {
             dataStreamSink.setParallelism(speedConfig.getWriterChannel());
         }
 
-        if(env instanceof MyLocalStreamEnvironment) {
-            if(StringUtils.isNotEmpty(savepointPath)){
+        if (env instanceof MyLocalStreamEnvironment) {
+            if (StringUtils.isNotEmpty(savepointPath)) {
                 ((MyLocalStreamEnvironment) env).setSettings(SavepointRestoreSettings.forPath(savepointPath));
             }
         }
@@ -140,12 +196,12 @@ public class Main {
         result.getAllAccumulatorResults().forEach((name, val) -> LOG.info(name + ": " + val));
 
         LOG.info("TASK DONE");
-        if(env instanceof MyLocalStreamEnvironment){
+        if (env instanceof MyLocalStreamEnvironment) {
             ResultPrintUtil.printResult(result);
         }
     }
 
-    private static void configRestartStrategy(StreamExecutionEnvironment env, DataTransferConfig config){
+    private static void configRestartStrategy(StreamExecutionEnvironment env, DataTransferConfig config) {
         if (needRestart(config)) {
             RestartConfig restartConfig = findRestartConfig(config);
             if (RestartConfig.STRATEGY_FIXED_DELAY.equalsIgnoreCase(restartConfig.getStrategy())) {
@@ -175,18 +231,18 @@ public class Main {
 
         Object restartConfigObj = config.getJob().getContent().get(0).getReader().getParameter().getVal(RestartConfig.KEY_STRATEGY);
         if (null != restartConfigObj) {
-            return new RestartConfig((Map<String, Object>)restartConfigObj);
+            return new RestartConfig((Map<String, Object>) restartConfigObj);
         }
 
         restartConfigObj = config.getJob().getContent().get(0).getWriter().getParameter().getVal(RestartConfig.KEY_STRATEGY);
         if (null != restartConfigObj) {
-            return new RestartConfig((Map<String, Object>)restartConfigObj);
+            return new RestartConfig((Map<String, Object>) restartConfigObj);
         }
 
         return RestartConfig.defaultConfig();
     }
 
-    private static boolean needRestart(DataTransferConfig config){
+    private static boolean needRestart(DataTransferConfig config) {
         return config.getJob().getSetting().getRestoreConfig().isStream();
     }
 
@@ -195,7 +251,7 @@ public class Main {
         if (READER.equalsIgnoreCase(testConfig.getSpeedTest())) {
             ContentConfig contentConfig = config.getJob().getContent().get(0);
             contentConfig.getWriter().setName(STREAM_WRITER);
-        } else if (WRITER.equalsIgnoreCase(testConfig.getSpeedTest())){
+        } else if (WRITER.equalsIgnoreCase(testConfig.getSpeedTest())) {
             ContentConfig contentConfig = config.getJob().getContent().get(0);
             contentConfig.getReader().setName(STREAM_READER);
         }
@@ -203,20 +259,20 @@ public class Main {
         config.getJob().getSetting().getSpeed().setBytes(-1);
     }
 
-    private static void addEnvClassPath(StreamExecutionEnvironment env, Set<URL> classPathSet) throws Exception{
+    private static void addEnvClassPath(StreamExecutionEnvironment env, Set<URL> classPathSet) throws Exception {
         int i = 0;
-        for(URL url : classPathSet){
+        for (URL url : classPathSet) {
             String classFileName = String.format(CLASS_FILE_NAME_FMT, i);
-            env.registerCachedFile(url.getPath(),  classFileName, true);
+            env.registerCachedFile(url.getPath(), classFileName, true);
             i++;
         }
 
-        if(env instanceof MyLocalStreamEnvironment){
+        if (env instanceof MyLocalStreamEnvironment) {
             ((MyLocalStreamEnvironment) env).setClasspaths(new ArrayList<>(classPathSet));
-        } else if(env instanceof StreamContextEnvironment){
+        } else if (env instanceof StreamContextEnvironment) {
             Field field = env.getClass().getDeclaredField("ctx");
             field.setAccessible(true);
-            ContextEnvironment contextEnvironment= (ContextEnvironment) field.get(env);
+            ContextEnvironment contextEnvironment = (ContextEnvironment) field.get(env);
 
             List<String> originUrlList = new ArrayList<>();
             for (URL url : contextEnvironment.getClasspaths()) {
@@ -224,15 +280,15 @@ public class Main {
             }
 
             for (URL url : classPathSet) {
-                if (!originUrlList.contains(url.toString())){
+                if (!originUrlList.contains(url.toString())) {
                     contextEnvironment.getClasspaths().add(url);
                 }
             }
         }
     }
 
-    private static Properties parseConf(String confStr) throws Exception{
-        if(StringUtils.isEmpty(confStr)){
+    private static Properties parseConf(String confStr) throws Exception {
+        if (StringUtils.isEmpty(confStr)) {
             return new Properties();
         }
 
@@ -240,15 +296,15 @@ public class Main {
         return objectMapper.readValue(confStr, Properties.class);
     }
 
-    private static StreamExecutionEnvironment openCheckpointConf(StreamExecutionEnvironment env, Properties properties){
-        if(properties!=null){
+    private static StreamExecutionEnvironment openCheckpointConf(StreamExecutionEnvironment env, Properties properties) {
+        if (properties != null) {
             String interval = properties.getProperty(ConfigConstant.FLINK_CHECKPOINT_INTERVAL_KEY);
-            if(StringUtils.isNotBlank(interval)){
+            if (StringUtils.isNotBlank(interval)) {
                 env.enableCheckpointing(Long.parseLong(interval.trim()));
                 LOG.info("Open checkpoint with interval:" + interval);
             }
             String checkpointTimeoutStr = properties.getProperty(ConfigConstant.FLINK_CHECKPOINT_TIMEOUT_KEY);
-            if(checkpointTimeoutStr != null){
+            if (checkpointTimeoutStr != null) {
                 long checkpointTimeout = Long.parseLong(checkpointTimeoutStr.trim());
                 //checkpoints have to complete within one min,or are discard
                 env.getCheckpointConfig().setCheckpointTimeout(checkpointTimeout);

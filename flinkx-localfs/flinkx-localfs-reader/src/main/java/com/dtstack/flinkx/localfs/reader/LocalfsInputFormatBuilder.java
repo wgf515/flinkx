@@ -16,41 +16,42 @@
  * limitations under the License.
  */
 
-package com.dtstack.flinkx.stream.writer;
+package com.dtstack.flinkx.localfs.reader;
 
-import com.dtstack.flinkx.outputformat.BaseRichOutputFormatBuilder;
+import com.dtstack.flinkx.inputformat.BaseRichInputFormatBuilder;
 import com.dtstack.flinkx.reader.MetaColumn;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
-/**
- * The builder of StreamOutputFormat
- *
- * @author jiangbo
- * @Company: www.dtstack.com
- */
-public class StreamOutputFormatBuilder extends BaseRichOutputFormatBuilder {
+public class LocalfsInputFormatBuilder extends BaseRichInputFormatBuilder {
 
-    private StreamOutputFormat format;
+    private LocalfsInputFormat format;
 
-    public StreamOutputFormatBuilder() {
-        super.format = format = new StreamOutputFormat();
+    public LocalfsInputFormatBuilder() {
+        super.format = format = new LocalfsInputFormat();
     }
 
-    public void setPrint(boolean print) {
-        format.print = print;
+    public void setPath(String path){
+        format.path = path;
     }
 
-    public void setMetaColumn(List<MetaColumn> metaColumns) {
-        format.metaColumns = metaColumns;
+    public void setEncoder(String encoder){
+        format.encoder = encoder;
     }
 
-    public void setWriteDelimiter(String writeDelimiter) {
-        format.writeDelimiter = writeDelimiter;
+    public void setColumns(List<MetaColumn> columns){
+        format.columns = columns;
     }
 
     @Override
     protected void checkFormat() {
+        if (StringUtils.isBlank(format.path)){
+            throw new IllegalArgumentException("path can not be empty");
+        }
 
+        if (format.columns == null || format.columns.size() == 0){
+            throw new IllegalArgumentException("columns can not be empty");
+        }
     }
 }

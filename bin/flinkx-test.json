@@ -3,106 +3,64 @@
 		"content": [
 			{
 				"reader": {
-					"name": "oraclereader",
+					"name": "hdfsreader",
 					"parameter": {
-						"username": "CARPO",
-						"password": "123456",
-						"connection": [
-							{
-								"jdbcUrl": [
-									"jdbc:oracle:thin:@192.168.1.83:1521:orcl"
-								],
-								"table": [
-									"ORACLE_ORACLE2"
-								]
-							}
-						],
-						"where": "",
-						"queryTimeOut": 0,
-						"increColumn": "",
-						"splitPk": "",
-						"fetchSize": 0,
+						"defaultFS": "hdfs://info1:8020",
+						"path": "/tmp/wgf/ftp2hdfs",
+						"fileType": "text",
+						"fieldDelimiter": ",",
+						"maxFileSize": 1073741824,
 						"column": [
 							{
-								"name": "NAME",
+								"name": "name",
 								"type": "string"
 							},
 							{
-								"name": "JOB",
+								"name": "sex",
 								"type": "string"
 							},
 							{
-								"name": "SALARY",
+								"name": "age",
 								"type": "int"
-							},
-							{
-								"name": "AGE",
-								"type": "bigint"
-							},
-							{
-								"name": "GENDER",
-								"type": "string"
-							},
-							{
-								"name": "TIME",
-								"type": "timestamp"
 							}
 						]
 					}
 				},
 				"writer": {
-					"name": "hdfswriter",
+					"name": "ftpwriter",
 					"parameter": {
-						"defaultFS": "hdfs://info1:8020",
-						"path": "/tmp/collecter/c2/oracle_info3_713/ORACLE_ORACLE2_oracle_info3_713",
-						"fileType": "text",
-						"writeMode": "overwrite",
+						"username": "europa",
+						"password": "europa",
+						"protocol": "ftp",
+						"host": "info4",
+						"port": 21,
+						"path": "ftp_1119",
 						"fieldDelimiter": ",",
-						"maxFileSize": 1073741824,
+						"isFirstLineHeader": false,
+						"writeMode": "append",
 						"column": [
 							{
-								"name": "NAME",
+								"name": "name",
 								"type": "string"
 							},
 							{
-								"name": "JOB",
+								"name": "sex",
 								"type": "string"
 							},
 							{
-								"name": "SALARY",
+								"name": "age",
 								"type": "int"
-							},
-							{
-								"name": "AGE",
-								"type": "bigint"
-							},
-							{
-								"name": "GENDER",
-								"type": "string"
-							},
-							{
-								"name": "TIME",
-								"type": "timestamp"
 							}
 						],
 						"encrypt": [
 							{
-								"name": "NAME"
+								"name": "name"
 							},
 							{
-								"name": "JOB"
+								"name": "sex"
 							},
 							{
-								"name": "SALARY"
-							},
-							{
-								"name": "AGE"
-							},
-							{
-								"name": "GENDER"
-							},
-							{
-								"name": "TIME"
+								"name": "age"
 							}
 						]
 					}

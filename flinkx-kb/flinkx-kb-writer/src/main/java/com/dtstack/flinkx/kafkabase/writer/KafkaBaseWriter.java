@@ -43,6 +43,7 @@ public class KafkaBaseWriter extends BaseDataWriter {
     protected String topic;
     protected Map<String, String> producerSettings;
     protected List<String> tableFields;
+    protected Map<String, String> hadoopConfig;
 
     @SuppressWarnings("unchecked")
     public KafkaBaseWriter(DataTransferConfig config) {
@@ -51,7 +52,7 @@ public class KafkaBaseWriter extends BaseDataWriter {
         timezone = writerConfig.getParameter().getStringVal(KEY_TIMEZONE);
         topic = writerConfig.getParameter().getStringVal(KEY_TOPIC);
         producerSettings = (Map<String, String>) writerConfig.getParameter().getVal(KEY_PRODUCER_SETTINGS);
-        tableFields = (List<String>)writerConfig.getParameter().getVal(KEY_TABLE_FIELDS);
+        tableFields = (List<String>) writerConfig.getParameter().getVal(KEY_TABLE_FIELDS);
     }
 
     @Override
@@ -62,6 +63,7 @@ public class KafkaBaseWriter extends BaseDataWriter {
         format.setProducerSettings(producerSettings);
         format.setRestoreConfig(restoreConfig);
         format.setTableFields(tableFields);
+        format.setHadoopConfig(hadoopConfig);
 
         return createOutput(dataSet, format);
     }

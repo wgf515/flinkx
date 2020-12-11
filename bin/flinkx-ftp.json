@@ -33,14 +33,14 @@
                     }
                 },
                 "writer": {
-                    "name": "hdfswriter",
+                    "name": "kafkawriter",
                     "parameter": {
-                        "defaultFS": "hdfs://info1:8020",
-                        "path": "/tmp/wgf/ftp2hdfs",
-                        "fileType": "text",
-                        "writeMode": "overwrite",
-                        "fieldDelimiter": ",",
-                        "maxFileSize": 1073741824,
+                        "producerSettings" : {
+                            "zookeeper.connect" : "info1:2181,info3:2181,info2:2181/info2_kafka",
+                            "bootstrap.servers" : "info2:9094"
+                        },
+                        "tableFields" : ["name","sex","age"],
+                        "topic" : "kafkawriter_test",
                         "column": [
                             {
                                 "name": "name",
@@ -83,7 +83,7 @@
                 "path": "/tmp/dtstack/flinkx/"
             },
             "speed": {
-                "channel": 1,
+                "channel": 2,
                 "bytes": 9223372036854775807
             },
             "errorLimit": {

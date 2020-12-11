@@ -15,44 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.dtstack.flinkx.kingbase.reader;
 
-package com.dtstack.flinkx.enums;
+import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.kingbase.KingbaseDatabaseMeta;
+import com.dtstack.flinkx.kingbase.format.KingbaseInputFormat;
+import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
+import com.dtstack.flinkx.rdb.inputformat.JdbcInputFormatBuilder;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-/**
- * Database type
- *
- * Company: www.dtstack.com
- * @author jiangbo
- */
-public enum EDatabaseType {
+public class KingbaseReader extends JdbcDataReader {
 
-    /**
-     * database type
-     */
-    MySQL,
-    SQLServer,
-    Oracle,
-    PostgreSQL,
-    Greenplum,
-    DB2,
-    MongoDB,
-    Redis,
-    ES,
-    SapHana,
-    TeraData,
-    kingbase,
+    public KingbaseReader(DataTransferConfig config, StreamExecutionEnvironment env) {
+        super(config, env);
+        setDatabaseInterface(new KingbaseDatabaseMeta());
+    }
 
-    /**
-     * contains ftp and sftp
-     */
-    FTP,
-    Hbase,
-    ODPS,
-    STREAM,
-    Carbondata,
-    GBase,
-    clickhouse,
-    polarDB,
-    Phoenix,
-    dm
+    @Override
+    protected JdbcInputFormatBuilder getBuilder() {
+        return new JdbcInputFormatBuilder(new KingbaseInputFormat());
+    }
 }

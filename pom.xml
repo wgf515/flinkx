@@ -58,6 +58,7 @@
         <module>flinkx-emqx</module>
         <module>flinkx-pulsar</module>
         <module>flinkx-restapi</module>
+        <module>flinkx-kingbase</module>
     </modules>
 
     <properties>

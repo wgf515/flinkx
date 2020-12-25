@@ -45,6 +45,8 @@
         <module>flinkx-redis</module>
         <module>flinkx-mongodb</module>
 
+        <module>flinkx-localfs</module>
+
         <!--******实时******-->
         <module>flinkx-binlog</module>
         <module>flinkx-pgwal</module>
@@ -56,6 +58,7 @@
         <module>flinkx-emqx</module>
         <module>flinkx-pulsar</module>
         <module>flinkx-restapi</module>
+        <module>flinkx-kingbase</module>
     </modules>
 
     <properties>

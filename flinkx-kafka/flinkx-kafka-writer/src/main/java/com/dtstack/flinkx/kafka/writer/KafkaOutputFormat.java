@@ -51,6 +51,15 @@ public class KafkaOutputFormat extends KafkaBaseOutputFormat {
         if (producerSettings != null) {
             props.putAll(producerSettings);
         }
+        if (hadoopConfig != null) {
+            String jaas = hadoopConfig.getOrDefault("kafka.jaas", null);
+            String krb5 = hadoopConfig.getOrDefault("kerberos.krb5", null);
+            if (jaas != null && krb5 != null) {
+                System.setProperty("java.security.auth.login.config", jaas);
+                System.setProperty("java.security.krb5.conf", krb5);
+                props.put("security.protocol", "SASL_PLAINTEXT");
+            }
+        }
         producer = new KafkaProducer<>(props);
     }
 

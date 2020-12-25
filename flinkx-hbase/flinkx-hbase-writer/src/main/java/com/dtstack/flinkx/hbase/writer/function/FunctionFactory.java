@@ -43,6 +43,9 @@ public class FunctionFactory {
             case "CONSTANT":
                 function = new ConstantFunction();
                 break;
+            case "SHA256":
+                function = new SHA256Function();
+                break;
             default:
                 throw new UnsupportedOperationException(String.format("function name[%s] don't exist!", functionName));
         }

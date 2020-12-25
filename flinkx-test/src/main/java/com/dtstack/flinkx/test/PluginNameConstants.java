@@ -57,6 +57,8 @@ public class PluginNameConstants {
     public static final String METADATAORACLE_READER = "metadataoraclereader";
     public static final String METADATAMYSQL_READER = "metadatamysqlreader";
     public static final String GREENPLUM_READER = "greenplumreader";
+    public static final String LOCALFS_READER = "localfsreader";
+    public static final String KINGBASE_READER = "kingbasereader";
 
     public static final String STREAM_WRITER = "streamwriter";
     public static final String CARBONDATA_WRITER = "carbondatawriter";

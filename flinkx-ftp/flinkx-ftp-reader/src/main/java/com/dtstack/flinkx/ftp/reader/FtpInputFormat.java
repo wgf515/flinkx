@@ -57,9 +57,7 @@ public class FtpInputFormat extends BaseRichInputFormat {
     @Override
     public void openInputFormat() throws IOException {
         super.openInputFormat();
-
         ftpHandler = FtpHandlerFactory.createFtpHandler(ftpConfig.getProtocol());
-        ftpHandler.loginFtpServer(ftpConfig);
     }
 
     @Override
@@ -95,6 +93,7 @@ public class FtpInputFormat extends BaseRichInputFormat {
     public void openInternal(InputSplit split) throws IOException {
         FtpInputSplit inputSplit = (FtpInputSplit)split;
         List<String> paths = inputSplit.getPaths();
+        ftpHandler.loginFtpServer(ftpConfig);
 
         if (ftpConfig.getIsFirstLineHeader()){
             br = new FtpSeqBufferedReader(ftpHandler,paths.iterator());

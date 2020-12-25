@@ -19,16 +19,18 @@
 package com.dtstack.flinkx.options;
 
 import com.dtstack.flinkx.util.MapUtil;
+import com.google.common.base.Charsets;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +69,7 @@ public class OptionParser {
         return cl;
     }
 
-    private void initOptions(CommandLine cl) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ParseException {
+    private void initOptions(CommandLine cl) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ParseException, UnsupportedEncodingException {
         Class cla = properties.getClass();
         Field[] fields = cla.getDeclaredFields();
         for(Field field:fields){
@@ -81,7 +83,7 @@ public class OptionParser {
             }
             if(StringUtils.isNotBlank(value)){
                 field.setAccessible(true);
-                field.set(properties,value);
+                field.set(properties, URLDecoder.decode(value, "UTF-8"));
             }
         }
     }
@@ -96,16 +98,17 @@ public class OptionParser {
         for(Map.Entry<String, Object> one : mapConf.entrySet()){
             String key = one.getKey();
             Object value = one.getValue();
-            if(value == null){
+            if(value == null) {
                 continue;
-            }else if(OPTION_JOB.equalsIgnoreCase(key)){
-                File file = new File(value.toString());
-                try (FileInputStream in = new FileInputStream(file)) {
-                    byte[] filecontent = new byte[(int) file.length()];
-                    in.read(filecontent);
-                    value = new String(filecontent, Charsets.UTF_8.name());
-                }
             }
+//            else if(OPTION_JOB.equalsIgnoreCase(key)){
+//                File file = new File(value.toString());
+//                try (FileInputStream in = new FileInputStream(file)) {
+//                    byte[] filecontent = new byte[(int) file.length()];
+//                    in.read(filecontent);
+//                    value = new String(filecontent, Charsets.UTF_8.name());
+//                }
+//            }
             args.add("-" + key);
             args.add(value.toString());
         }

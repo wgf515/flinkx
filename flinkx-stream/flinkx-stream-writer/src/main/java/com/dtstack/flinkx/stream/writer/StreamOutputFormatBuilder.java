@@ -26,8 +26,8 @@ import java.util.List;
 /**
  * The builder of StreamOutputFormat
  *
- * @Company: www.dtstack.com
  * @author jiangbo
+ * @Company: www.dtstack.com
  */
 public class StreamOutputFormatBuilder extends BaseRichOutputFormatBuilder {
 
@@ -37,7 +37,7 @@ public class StreamOutputFormatBuilder extends BaseRichOutputFormatBuilder {
         super.format = format = new StreamOutputFormat();
     }
 
-    public void setPrint(boolean print){
+    public void setPrint(boolean print) {
         format.print = print;
     }
 

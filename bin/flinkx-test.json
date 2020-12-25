@@ -1,0 +1,92 @@
+{
+	"job": {
+		"content": [
+			{
+				"reader": {
+					"name": "hdfsreader",
+					"parameter": {
+						"defaultFS": "hdfs://info1:8020",
+						"path": "/tmp/wgf/ftp2hdfs",
+						"fileType": "text",
+						"fieldDelimiter": ",",
+						"maxFileSize": 1073741824,
+						"column": [
+							{
+								"name": "name",
+								"type": "string"
+							},
+							{
+								"name": "sex",
+								"type": "string"
+							},
+							{
+								"name": "age",
+								"type": "int"
+							}
+						]
+					}
+				},
+				"writer": {
+					"name": "ftpwriter",
+					"parameter": {
+						"username": "europa",
+						"password": "europa",
+						"protocol": "ftp",
+						"host": "info4",
+						"port": 21,
+						"path": "ftp_1119",
+						"fieldDelimiter": ",",
+						"isFirstLineHeader": false,
+						"writeMode": "append",
+						"column": [
+							{
+								"name": "name",
+								"type": "string"
+							},
+							{
+								"name": "sex",
+								"type": "string"
+							},
+							{
+								"name": "age",
+								"type": "int"
+							}
+						],
+						"encrypt": [
+							{
+								"name": "name"
+							},
+							{
+								"name": "sex"
+							},
+							{
+								"name": "age"
+							}
+						]
+					}
+				}
+			}
+		],
+		"setting": {
+			"restore": {
+				"isRestore": false,
+				"isStream": false,
+				"restoreColumnName": "AGE",
+				"maxRowNumForCheckpoint": 1
+			},
+			"log": {
+				"isLogger": false,
+				"level": "info",
+				"path": "/tmp/dtstack/flinkx/"
+			},
+			"speed": {
+				"channel": 1,
+				"bytes": 9223372036854775807
+			},
+			"errorLimit": {
+				"record": 0,
+				"percentage": 0.0
+			}
+		}
+	}
+}

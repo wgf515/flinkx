@@ -281,7 +281,7 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
         }
         Row internalRow = nextRecordInternal(row);
         if(internalRow != null){
-            internalRow = setChannelInformation(internalRow);
+//            internalRow = setChannelInformation(internalRow);
 
             updateDuration();
             if(numReadCounter !=null ){

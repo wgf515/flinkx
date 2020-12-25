@@ -29,11 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Date: 2019/11/21
@@ -50,6 +46,7 @@ public class KafkaBaseOutputFormat extends BaseRichOutputFormat {
     protected String topic;
     protected Map<String, String> producerSettings;
     protected List<String> tableFields;
+    protected Map<String, String> hadoopConfig;
     protected static JsonDecoder jsonDecoder = new JsonDecoder();
     protected static ObjectMapper objectMapper = new ObjectMapper();
     //连续发送数据错误次数
@@ -85,7 +82,7 @@ public class KafkaBaseOutputFormat extends BaseRichOutputFormat {
                     map.put(tableFields.get(i), org.apache.flink.util.StringUtils.arrayAwareToString(row.getField(i)));
                 }
             } else {
-                if(arity == 1){
+                if (arity == 1) {
                     Object obj = row.getField(0);
                     if (obj instanceof Map) {
                         map = (Map<String, Object>) obj;
@@ -94,7 +91,7 @@ public class KafkaBaseOutputFormat extends BaseRichOutputFormat {
                     } else {
                         map = Collections.singletonMap("message", row.toString());
                     }
-                }else{
+                } else {
                     map = Collections.singletonMap("message", row.toString());
                 }
             }
@@ -149,6 +146,10 @@ public class KafkaBaseOutputFormat extends BaseRichOutputFormat {
 
     public void setTableFields(List<String> tableFields) {
         this.tableFields = tableFields;
+    }
+
+    public void setHadoopConfig(Map<String, String> hadoopConfig) {
+        this.hadoopConfig = hadoopConfig;
     }
 
 }

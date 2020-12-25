@@ -27,6 +27,7 @@ import com.dtstack.flinkx.carbondata.writer.CarbondataWriter;
 import com.dtstack.flinkx.clickhouse.reader.ClickhouseReader;
 import com.dtstack.flinkx.clickhouse.writer.ClickhouseWriter;
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.SpeedConfig;
 import com.dtstack.flinkx.constants.ConfigConstant;
 import com.dtstack.flinkx.db2.reader.Db2Reader;
 import com.dtstack.flinkx.db2.writer.Db2Writer;
@@ -55,8 +56,10 @@ import com.dtstack.flinkx.kafka10.reader.Kafka10Reader;
 import com.dtstack.flinkx.kafka10.writer.Kafka10Writer;
 import com.dtstack.flinkx.kafka11.reader.Kafka11Reader;
 import com.dtstack.flinkx.kafka11.writer.Kafka11Writer;
+import com.dtstack.flinkx.kingbase.reader.KingbaseReader;
 import com.dtstack.flinkx.kudu.reader.KuduReader;
 import com.dtstack.flinkx.kudu.writer.KuduWriter;
+import com.dtstack.flinkx.localfs.reader.LocalfsReader;
 import com.dtstack.flinkx.mongodb.reader.MongodbReader;
 import com.dtstack.flinkx.mongodb.writer.MongodbWriter;
 import com.dtstack.flinkx.mysql.reader.MysqlReader;
@@ -80,12 +83,16 @@ import com.dtstack.flinkx.sqlserver.writer.SqlserverWriter;
 import com.dtstack.flinkx.stream.reader.StreamReader;
 import com.dtstack.flinkx.stream.writer.StreamWriter;
 import com.dtstack.flinkx.streaming.runtime.partitioner.CustomPartitioner;
+import com.dtstack.flinkx.udf.UserDefinedFunctionRegistry;
+import com.dtstack.flinkx.util.ConvertUtil;
 import com.dtstack.flinkx.util.ResultPrintUtil;
 import com.dtstack.flinkx.writer.BaseDataWriter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.time.Time;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
@@ -94,9 +101,12 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.transformations.PartitionTransformation;
+import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +114,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -131,8 +144,11 @@ public class LocalTest {
 //        conf.setString("metrics.reporter.promgateway.randomJobNameSuffix","true");
 //        conf.setString("metrics.reporter.promgateway.deleteOnShutdown","true");
 
-        String jobPath = "D:\\dtstack\\flinkx-all\\flinkx-test\\src\\main\\resources\\dev_test_job\\metadatasqlserver_stream.json";
-        JobExecutionResult result = LocalTest.runJob(new File(jobPath), confProperties, null);
+
+        String jobPath = "D:\\workspace\\flinkx\\bin\\flinkx-test.json";
+        String savePointPath = "";
+        JobExecutionResult result = LocalTest.runJob(new File(jobPath), confProperties, savePointPath);
+
         ResultPrintUtil.printResult(result);
     }
 
@@ -160,15 +176,96 @@ public class LocalTest {
             ));
         }
 
+
+
+        //注册udf
+        StreamTableEnvironment tableContext = StreamTableEnvironment.create(env);
+        UserDefinedFunctionRegistry udfRegistry = new UserDefinedFunctionRegistry(tableContext);
+        udfRegistry.registerInternalUDFs();
+
+
         BaseDataReader reader = buildDataReader(config, env);
         DataStream<Row> dataStream = reader.readData();
+        SpeedConfig speedConfig = config.getJob().getSetting().getSpeed();
+        if (speedConfig.getReaderChannel() > 0) {
+            dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+        }
 
         dataStream = new DataStream<>(dataStream.getExecutionEnvironment(),
                 new PartitionTransformation<>(dataStream.getTransformation(),
                         new CustomPartitioner<>()));
 
-        BaseDataWriter writer = buildDataWriter(config);
-        writer.writeData(dataStream);
+        LOG.info("dataStream size: " + dataStream.getType().getArity());
+        LOG.info("dataStream type:" + dataStream.getType());
+
+        /*数据处理*/
+
+        String tableName = "tmpTable";
+        List<String> fields = new ArrayList<>();
+        //获取字段处理方法
+        List<Map<String, String>> mapList = (List<Map<String, String>>) config.getJob().getContent().get(0).getWriter().getParameter().getVal("encrypt");
+
+        if (mapList == null || mapList.size() == 0) {
+            return null;
+        }
+
+        //构造sql
+        StringBuilder sb = new StringBuilder("SELECT ");
+        for (Map<String, String> map : mapList) {
+            fields.add(map.get("name"));
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(map.get("type"))) {
+                sb.append(map.get("type") + "(`" + map.get("name") + "`)");
+            } else {
+                sb.append("`" + map.get("name") + "`");
+            }
+            sb.append(" AS `" + map.get("name") + "`,");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append(" FROM ").append(tableName);
+
+        LOG.info("sql is:" + sb.toString());
+
+        List<Map<String, String>> columns = config.getJob().getContent().get(0).getWriter().getParameter().getColumn();
+
+        LOG.info("columns size is :" + columns.size());
+
+        RowTypeInfo rowTypeInfo = ConvertUtil.buildRowTypeInfo(columns);
+
+        LOG.info("rowTypeInfo: " + rowTypeInfo);
+
+        SingleOutputStreamOperator<Row> streamOperator = dataStream.map(new MapFunction<Row, Row>() {
+            @Override
+            public Row map(Row row) throws Exception {
+                return row;
+            }
+        }).returns(rowTypeInfo);
+
+        LOG.info("fields size is :" + fields.size());
+
+        //生成临时表
+        tableContext.registerDataStream(tableName, streamOperator, org.apache.commons.lang3.StringUtils.join(fields, ","));
+
+        LOG.info("typeInfo size is :" + streamOperator.getType().getArity());
+
+        LOG.info("streamOperator type:" + streamOperator.getType());
+
+        Table table = tableContext.sqlQuery(sb.toString());
+
+        System.out.println("==================");
+
+        table.printSchema();
+
+        System.out.println("==================");
+
+        //数据处理
+        DataStream<Row> dataStream1 = tableContext.toAppendStream(table, Row.class);
+
+
+        BaseDataWriter dataWriter = buildDataWriter(config);
+        DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream1);
+        if (speedConfig.getWriterChannel() > 0) {
+            dataStreamSink.setParallelism(speedConfig.getWriterChannel());
+        }
 
         if(StringUtils.isNotEmpty(savepointPath)){
             env.setSettings(SavepointRestoreSettings.forPath(savepointPath));
@@ -222,6 +319,8 @@ public class LocalTest {
             case PluginNameConstants.EMQX_READER : reader = new EmqxReader(config, env); break;
             case PluginNameConstants.DM_READER : reader = new DmReader(config, env); break;
             case PluginNameConstants.GREENPLUM_READER : reader = new GreenplumReader(config, env); break;
+            case PluginNameConstants.LOCALFS_READER : reader = new LocalfsReader(config, env); break;
+            case PluginNameConstants.KINGBASE_READER : reader = new KingbaseReader(config, env); break;
             default:throw new IllegalArgumentException("Can not find reader by name:" + readerName);
         }
 

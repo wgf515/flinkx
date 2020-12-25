@@ -440,7 +440,8 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
 
     @Override
     public void writeRecord(Row row) throws IOException {
-        Row internalRow = setChannelInfo(row);
+        Row internalRow = row;
+//        Row internalRow = setChannelInfo(row);
         if(batchInterval <= 1) {
             writeSingleRecord(internalRow);
         } else {

@@ -17,20 +17,19 @@
  */
 
 
-
 package com.dtstack.flinkx.constants;
 
 
 /**
- *
  * @author sishu.yss
- *
  */
 public class ConfigConstant {
 
     public static final String FLINK_CHECKPOINT_INTERVAL_KEY = "flink.checkpoint.interval";
 
     public static final String FLINK_CHECKPOINT_TIMEOUT_KEY = "flink.checkpoint.timeout";
+
+    public static final String FLINK_CHECKPOINT_PATH_KEY = "flink.checkpoint.path";
 
     public static final String KEY_READER = "reader";
 
@@ -43,6 +42,5 @@ public class ConfigConstant {
     public static final String KEY_PASSWORD = "password";
 
     public static final String KEY_CONFUSED_PASSWORD = "******";
-
 
 }

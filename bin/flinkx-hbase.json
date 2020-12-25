@@ -1,0 +1,81 @@
+{
+	"job": {
+		"content": [
+			{
+				"reader": {
+					"name": "oraclereader",
+					"parameter": {
+						"username": "carpo",
+						"password": "123456",
+						"connection": [
+							{
+								"jdbcUrl": [
+									"jdbc:oracle:thin:@192.168.1.83:1521:orcl"
+								],
+								"table": [
+									"blob_test"
+								]
+							}
+						],
+						"column": [
+							{
+								"name": "blob",
+								"type": "binary"
+							},
+							{
+								"name": "id",
+								"type": "int"
+							}
+						],
+						"where": "",
+						"queryTimeOut": 0,
+						"requestAccumulatorInterval": 2,
+						"fetchSize": 0
+					}
+				},
+				"writer": {
+					"name": "hbasewriter",
+					"parameter": {
+						"table": "default:flinkx_object_test",
+						"rowkeyColumn": "SHA256($(cf1:id)_$(cf1:id))",
+						"hbaseConfig": {
+							"hbase.zookeeper.property.clientPort": "2181",
+							"hbase.zookeeper.quorum": "info1",
+							"zookeeper.znode.parent": "/hbase-unsecure"
+						},
+						"column": [
+							{
+								"name": "cf2:blob",
+								"type": "binary"
+							},
+							{
+								"name": "cf1:id",
+								"type": "int"
+							}
+						]
+					}
+				}
+			}
+		],
+		"setting": {
+			"restore": {
+				"isRestore": false,
+				"isStream": false,
+				"maxRowNumForCheckpoint": 1
+			},
+			"log": {
+				"isLogger": false,
+				"level": "info",
+				"path": "/tmp/dtstack/flinkx/"
+			},
+			"speed": {
+				"channel": 1,
+				"bytes": 9223372036854775807
+			},
+			"errorLimit": {
+				"record": 0,
+				"percentage": 0.0
+			}
+		}
+	}
+}

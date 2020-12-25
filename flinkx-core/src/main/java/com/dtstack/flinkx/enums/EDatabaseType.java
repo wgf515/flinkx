@@ -42,6 +42,7 @@ public enum EDatabaseType {
     ES,
     SapHana,
     TeraData,
+    kingbase,
 
     /**
      * contains ftp and sftp

@@ -45,7 +45,7 @@ import org.apache.parquet.io.api.Binary;
  */
 public class HdfsUtil {
 
-    public static final String NULL_VALUE = "\\N";
+    public static final String NULL_VALUE = "";
 
     private static final long NANO_SECONDS_PER_DAY = 86400_000_000_000L;
 

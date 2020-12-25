@@ -142,6 +142,7 @@ public class MyLocalStreamEnvironment extends StreamExecutionEnvironment {
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Running job on local embedded Flink mini cluster");
+            LOG.info("Local flink jobId:" + jobGraph.getJobID().toString());
         }
 
         MiniCluster miniCluster = new MiniCluster(cfg);

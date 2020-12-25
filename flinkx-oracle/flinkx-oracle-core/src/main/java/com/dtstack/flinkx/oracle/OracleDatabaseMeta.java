@@ -71,12 +71,14 @@ public class OracleDatabaseMeta extends BaseDatabaseMeta {
 
     @Override
     public String getSplitFilter(String columnName) {
-        return String.format("mod(%s, ${N}) = ${M}", getStartQuote() + columnName + getEndQuote());
+//        return String.format("mod(%s, ${N}) = ${M}", getStartQuote() + columnName + getEndQuote());
+        return String.format("dbms_utility.get_hash_value(%s, 0, ${N}) = ${M}", getStartQuote() + columnName + getEndQuote());
     }
 
     @Override
     public String getSplitFilterWithTmpTable(String tmpTable, String columnName) {
-        return String.format("mod(%s.%s, ${N}) = ${M}", tmpTable, getStartQuote() + columnName + getEndQuote());
+//        return String.format("mod(%s.%s, ${N}) = ${M}", tmpTable, getStartQuote() + columnName + getEndQuote());
+        return String.format("dbms_utility.get_hash_value(%s.%s, 0, ${N}) = ${M}", tmpTable, getStartQuote() + columnName + getEndQuote());
     }
 
     @Override

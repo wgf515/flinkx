@@ -1,0 +1,95 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "ftpreader",
+                    "parameter": {
+                        "username": "europa",
+                        "password": "europa",
+                        "protocol": "ftp",
+                        "host": "info4",
+                        "port": 21,
+                        "path": "ftp_wgf",
+                        "fieldDelimiter": ",",
+                        "isFirstLineHeader": false,
+                        "column": [
+                            {
+                                "index": 0,
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "index": 1,
+                                "name": "sex",
+                                "type": "string"
+                            },
+                            {
+                                "index": 2,
+                                "name": "age",
+                                "type": "int"
+                            }
+                        ]
+                    }
+                },
+                "writer": {
+                    "name": "kafkawriter",
+                    "parameter": {
+                        "producerSettings" : {
+                            "zookeeper.connect" : "info1:2181,info3:2181,info2:2181/info2_kafka",
+                            "bootstrap.servers" : "info2:9094"
+                        },
+                        "tableFields" : ["name","sex","age"],
+                        "topic" : "kafkawriter_test",
+                        "column": [
+                            {
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "name": "sex",
+                                "type": "string"
+                            },
+                            {
+                                "name": "age",
+                                "type": "int"
+                            }
+                        ],
+                        "encrypt": [
+                            {
+                                "name": "name",
+                                "type": "BLANK"
+                            },
+                            {
+                                "name": "sex"
+                            },
+                            {
+                                "name": "age"
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "setting": {
+            "restore": {
+                "isRestore": false,
+                "isStream": false,
+                "maxRowNumForCheckpoint": 1
+            },
+            "log": {
+                "isLogger": false,
+                "level": "info",
+                "path": "/tmp/dtstack/flinkx/"
+            },
+            "speed": {
+                "channel": 2,
+                "bytes": 9223372036854775807
+            },
+            "errorLimit": {
+                "record": 0,
+                "percentage": 0.0
+            }
+        }
+    }
+}

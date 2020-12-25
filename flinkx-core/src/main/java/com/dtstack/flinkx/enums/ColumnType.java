@@ -26,8 +26,9 @@ import java.util.List;
 /**
  * Define standard column type for all the readers or writers that do not
  * have special types of their own
- *
+ * <p>
  * Company: www.dtstack.com
+ *
  * @author huyifan.zju@163.com
  */
 public enum ColumnType {
@@ -40,7 +41,7 @@ public enum ColumnType {
     /**
      * number type
      */
-    INT, INT32, MEDIUMINT, TINYINT, DATETIME, SMALLINT, BIGINT, LONG, INT64 , SHORT, INTEGER, NUMBER,
+    INT, INT32, MEDIUMINT, TINYINT, DATETIME, SMALLINT, BIGINT, LONG, INT64, SHORT, INTEGER, NUMBER,
 
     /**
      * double type
@@ -52,7 +53,8 @@ public enum ColumnType {
      * date type
      */
     DATE, TIMESTAMP, TIME,
-    DECIMAL, YEAR, BIT;
+    DECIMAL, YEAR, BIT, BYTE;
+
 
     public static List<ColumnType> TIME_TYPE = Arrays.asList(
             DATE, DATETIME, TIME, TIMESTAMP
@@ -67,28 +69,28 @@ public enum ColumnType {
     );
 
     public static ColumnType fromString(String type) {
-        if(type == null) {
+        if (type == null) {
             throw new RuntimeException("null ColumnType!");
         }
 
-        if(type.contains(ConstantValue.LEFT_PARENTHESIS_SYMBOL)){
+        if (type.contains(ConstantValue.LEFT_PARENTHESIS_SYMBOL)) {
             type = type.substring(0, type.indexOf(ConstantValue.LEFT_PARENTHESIS_SYMBOL));
         }
 
         return valueOf(type.toUpperCase());
     }
 
-    public static ColumnType getType(String type){
-        if(type.contains(ConstantValue.LEFT_PARENTHESIS_SYMBOL)){
+    public static ColumnType getType(String type) {
+        if (type.contains(ConstantValue.LEFT_PARENTHESIS_SYMBOL)) {
             type = type.substring(0, type.indexOf(ConstantValue.LEFT_PARENTHESIS_SYMBOL));
         }
 
-        if(type.toLowerCase().contains(ColumnType.TIMESTAMP.name().toLowerCase())){
+        if (type.toLowerCase().contains(ColumnType.TIMESTAMP.name().toLowerCase())) {
             return TIMESTAMP;
         }
 
         for (ColumnType value : ColumnType.values()) {
-            if(type.equalsIgnoreCase(value.name())){
+            if (type.equalsIgnoreCase(value.name())) {
                 return value;
             }
         }
@@ -96,11 +98,11 @@ public enum ColumnType {
         return ColumnType.STRING;
     }
 
-    public static boolean isTimeType(String type){
+    public static boolean isTimeType(String type) {
         return TIME_TYPE.contains(getType(type));
     }
 
-    public static boolean isNumberType(String type){
+    public static boolean isNumberType(String type) {
         return NUMBER_TYPE.contains(getType(type));
     }
 

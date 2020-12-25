@@ -67,6 +67,27 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-scala_2.11</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner_2.11</artifactId>
+            <version>1.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge_2.11</artifactId>
+            <version>1.8.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.lukehutch</groupId>
+            <artifactId>fast-classpath-scanner</artifactId>
+            <version>3.1.13</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -135,6 +156,16 @@
             <artifactId>simpleclient</artifactId>
             <version>0.5.0</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+            <version>1.9.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -165,20 +196,20 @@
                                     <mainClass>com.dtstack.flinkx.Main</mainClass>
                                 </transformer>
                             </transformers>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.google.guava:*</include>
-                                    <include>com.google.code.gson:*</include>
-                                    <include>ch.qos.logback:*</include>
-                                    <include>org.slf4j:*</include>
-                                    <include>org.apache.httpcomponents:*</include>
-                                    <include>io.prometheus:*</include>
-                                    <include>org.apache.avro:*</include>
-                                    <include>org.codehaus.jackson:*</include>
-                                    <include>com.fasterxml.jackson.core:*</include>
-                                    <include>commons-*:*</include>
-                                </includes>
-                            </artifactSet>
+<!--                            <artifactSet>-->
+<!--                                <includes>-->
+<!--                                    <include>com.google.guava:*</include>-->
+<!--                                    <include>com.google.code.gson:*</include>-->
+<!--                                    <include>ch.qos.logback:*</include>-->
+<!--                                    <include>org.slf4j:*</include>-->
+<!--                                    <include>org.apache.httpcomponents:*</include>-->
+<!--                                    <include>io.prometheus:*</include>-->
+<!--                                    <include>org.apache.avro:*</include>-->
+<!--                                    <include>org.codehaus.jackson:*</include>-->
+<!--                                    <include>com.fasterxml.jackson.core:*</include>-->
+<!--                                    <include>commons-*:*</include>-->
+<!--                                </includes>-->
+<!--                            </artifactSet>-->
                             <relocations>
                                 <relocation>
                                     <pattern>com.google.common</pattern>

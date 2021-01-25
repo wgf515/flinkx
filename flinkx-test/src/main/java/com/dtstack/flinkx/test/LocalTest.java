@@ -29,6 +29,7 @@ import com.dtstack.flinkx.clickhouse.writer.ClickhouseWriter;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.config.SpeedConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.constants.ConfigConstant;
 import com.dtstack.flinkx.db2.reader.Db2Reader;
 import com.dtstack.flinkx.db2.writer.Db2Writer;
@@ -88,6 +89,7 @@ import com.dtstack.flinkx.udf.UserDefinedFunctionRegistry;
 import com.dtstack.flinkx.util.ConvertUtil;
 import com.dtstack.flinkx.util.ResultPrintUtil;
 import com.dtstack.flinkx.writer.BaseDataWriter;
+import com.dtstack.flinkx.writer.DataWriterFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -268,11 +270,18 @@ public class LocalTest {
         DataStream<Row> dataStream1 = tableContext.toAppendStream(table, Row.class);
 
 
-        BaseDataWriter dataWriter = buildDataWriter(config);
-        DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream1);
-        if (speedConfig.getWriterChannel() > 0) {
-            dataStreamSink.setParallelism(speedConfig.getWriterChannel());
+        List<WriterConfig> writerConfigs = config.getJob().getContent().get(0).getWriter();
+
+        for (WriterConfig writerConfig : writerConfigs) {
+            BaseDataWriter dataWriter = buildDataWriter(config, writerConfig);
+            DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream1);
         }
+
+//        BaseDataWriter dataWriter = buildDataWriter(config);
+//        DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream1);
+//        if (speedConfig.getWriterChannel() > 0) {
+//            dataStreamSink.setParallelism(speedConfig.getWriterChannel());
+//        }
 
         if(StringUtils.isNotEmpty(savepointPath)){
             env.setSettings(SavepointRestoreSettings.forPath(savepointPath));
@@ -334,38 +343,38 @@ public class LocalTest {
         return reader;
     }
 
-    private static BaseDataWriter buildDataWriter(DataTransferConfig config){
-        String writerName = config.getJob().getContent().get(0).getWriter().getName();
+    private static BaseDataWriter buildDataWriter(DataTransferConfig config, WriterConfig writerConfig){
+        String writerName = writerConfig.getName();
         BaseDataWriter writer;
         switch (writerName){
-            case PluginNameConstants.STREAM_WRITER : writer = new StreamWriter(config); break;
-            case PluginNameConstants.CARBONDATA_WRITER : writer = new CarbondataWriter(config); break;
-            case PluginNameConstants.MYSQL_WRITER : writer = new MysqlWriter(config); break;
-            case PluginNameConstants.SQLSERVER_WRITER : writer = new SqlserverWriter(config); break;
-            case PluginNameConstants.ORACLE_WRITER : writer = new OracleWriter(config); break;
-            case PluginNameConstants.POSTGRESQL_WRITER : writer = new PostgresqlWriter(config); break;
-            case PluginNameConstants.DB2_WRITER : writer = new Db2Writer(config); break;
-            case PluginNameConstants.GBASE_WRITER : writer = new GbaseWriter(config); break;
-            case PluginNameConstants.ES_WRITER : writer = new EsWriter(config); break;
-            case PluginNameConstants.FTP_WRITER : writer = new FtpWriter(config); break;
-            case PluginNameConstants.HBASE_WRITER : writer = new HbaseWriter(config); break;
-            case PluginNameConstants.HDFS_WRITER : writer = new HdfsWriter(config); break;
-            case PluginNameConstants.MONGODB_WRITER : writer = new MongodbWriter(config); break;
-            case PluginNameConstants.ODPS_WRITER : writer = new OdpsWriter(config); break;
-            case PluginNameConstants.REDIS_WRITER : writer = new RedisWriter(config); break;
-            case PluginNameConstants.HIVE_WRITER : writer = new HiveWriter(config); break;
-            case PluginNameConstants.KAFKA09_WRITER : writer = new Kafka09Writer(config); break;
-            case PluginNameConstants.KAFKA10_WRITER : writer = new Kafka10Writer(config); break;
-            case PluginNameConstants.KAFKA11_WRITER : writer = new Kafka11Writer(config); break;
-            case PluginNameConstants.KUDU_WRITER : writer = new KuduWriter(config); break;
-            case PluginNameConstants.CLICKHOUSE_WRITER : writer = new ClickhouseWriter(config); break;
-            case PluginNameConstants.POLARDB_WRITER : writer = new PolardbWriter(config); break;
-            case PluginNameConstants.KAFKA_WRITER : writer = new KafkaWriter(config); break;
-            case PluginNameConstants.PHOENIX_WRITER : writer = new PhoenixWriter(config); break;
-            case PluginNameConstants.EMQX_WRITER : writer = new EmqxWriter(config); break;
-            case PluginNameConstants.RESTAPI_WRITER : writer = new RestapiWriter(config);break;
-            case PluginNameConstants.DM_WRITER : writer = new DmWriter(config); break;
-            case PluginNameConstants.GREENPLUM_WRITER : writer = new GreenplumWriter(config); break;
+            case PluginNameConstants.STREAM_WRITER : writer = new StreamWriter(config, writerConfig); break;
+            case PluginNameConstants.CARBONDATA_WRITER : writer = new CarbondataWriter(config, writerConfig); break;
+            case PluginNameConstants.MYSQL_WRITER : writer = new MysqlWriter(config, writerConfig); break;
+            case PluginNameConstants.SQLSERVER_WRITER : writer = new SqlserverWriter(config, writerConfig); break;
+            case PluginNameConstants.ORACLE_WRITER : writer = new OracleWriter(config, writerConfig); break;
+            case PluginNameConstants.POSTGRESQL_WRITER : writer = new PostgresqlWriter(config, writerConfig); break;
+            case PluginNameConstants.DB2_WRITER : writer = new Db2Writer(config, writerConfig); break;
+            case PluginNameConstants.GBASE_WRITER : writer = new GbaseWriter(config, writerConfig); break;
+            case PluginNameConstants.ES_WRITER : writer = new EsWriter(config, writerConfig); break;
+            case PluginNameConstants.FTP_WRITER : writer = new FtpWriter(config, writerConfig); break;
+            case PluginNameConstants.HBASE_WRITER : writer = new HbaseWriter(config, writerConfig); break;
+            case PluginNameConstants.HDFS_WRITER : writer = new HdfsWriter(config, writerConfig); break;
+            case PluginNameConstants.MONGODB_WRITER : writer = new MongodbWriter(config, writerConfig); break;
+            case PluginNameConstants.ODPS_WRITER : writer = new OdpsWriter(config, writerConfig); break;
+            case PluginNameConstants.REDIS_WRITER : writer = new RedisWriter(config, writerConfig); break;
+            case PluginNameConstants.HIVE_WRITER : writer = new HiveWriter(config, writerConfig); break;
+            case PluginNameConstants.KAFKA09_WRITER : writer = new Kafka09Writer(config, writerConfig); break;
+            case PluginNameConstants.KAFKA10_WRITER : writer = new Kafka10Writer(config, writerConfig); break;
+            case PluginNameConstants.KAFKA11_WRITER : writer = new Kafka11Writer(config, writerConfig); break;
+            case PluginNameConstants.KUDU_WRITER : writer = new KuduWriter(config, writerConfig); break;
+            case PluginNameConstants.CLICKHOUSE_WRITER : writer = new ClickhouseWriter(config, writerConfig); break;
+            case PluginNameConstants.POLARDB_WRITER : writer = new PolardbWriter(config, writerConfig); break;
+            case PluginNameConstants.KAFKA_WRITER : writer = new KafkaWriter(config, writerConfig); break;
+            case PluginNameConstants.PHOENIX_WRITER : writer = new PhoenixWriter(config, writerConfig); break;
+            case PluginNameConstants.EMQX_WRITER : writer = new EmqxWriter(config, writerConfig); break;
+            case PluginNameConstants.RESTAPI_WRITER : writer = new RestapiWriter(config, writerConfig);break;
+            case PluginNameConstants.DM_WRITER : writer = new DmWriter(config, writerConfig); break;
+            case PluginNameConstants.GREENPLUM_WRITER : writer = new GreenplumWriter(config, writerConfig); break;
             default:throw new IllegalArgumentException("Can not find writer by name:" + writerName);
         }
 

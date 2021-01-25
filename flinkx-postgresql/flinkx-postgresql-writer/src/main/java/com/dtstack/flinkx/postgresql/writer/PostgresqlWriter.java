@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.postgresql.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.postgresql.PostgresqlDatabaseMeta;
 import com.dtstack.flinkx.postgresql.PostgresqlTypeConverter;
 import com.dtstack.flinkx.postgresql.format.PostgresqlOutputFormat;
@@ -37,8 +38,8 @@ import org.apache.flink.types.Row;
  */
 public class PostgresqlWriter extends JdbcDataWriter {
 
-    public PostgresqlWriter(DataTransferConfig config) {
-        super(config);
+    public PostgresqlWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         setDatabaseInterface(new PostgresqlDatabaseMeta());
         setTypeConverterInterface(new PostgresqlTypeConverter());
     }

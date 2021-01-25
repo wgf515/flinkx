@@ -51,9 +51,9 @@ public class OdpsWriter extends BaseDataWriter {
 
     protected long bufferSize;
 
-    public OdpsWriter(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public OdpsWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         odpsConfig = (Map<String, String>) writerConfig.getParameter().getVal(OdpsConfigKeys.KEY_ODPS_CONFIG);
         tableName = writerConfig.getParameter().getStringVal(OdpsConfigKeys.KEY_TABLE);
         partition = writerConfig.getParameter().getStringVal(OdpsConfigKeys.KEY_PARTITION);

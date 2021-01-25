@@ -76,10 +76,10 @@ public class RedisWriter extends BaseDataWriter {
 
     private String valueFieldDelimiter;
 
-    public RedisWriter(DataTransferConfig config) {
-        super(config);
+    public RedisWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
 
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         hostPort = writerConfig.getParameter().getStringVal(KEY_HOST_PORT);
         batchSize = writerConfig.getParameter().getIntVal(KEY_BATCH_SIZE,1);
         password = writerConfig.getParameter().getStringVal(KEY_PASSWORD);

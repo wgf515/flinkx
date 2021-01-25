@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.stream.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.reader.MetaColumn;
 import com.dtstack.flinkx.writer.BaseDataWriter;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -42,13 +43,13 @@ public class StreamWriter extends BaseDataWriter {
 
     private List<MetaColumn> metaColumns;
 
-    public StreamWriter(DataTransferConfig config) {
-        super(config);
-        print = config.getJob().getContent().get(0).getWriter().getParameter().getBooleanVal("print",false);
-        writeDelimiter = config.getJob().getContent().get(0).getWriter().getParameter().getStringVal("writeDelimiter", "|");
-        batchInterval = config.getJob().getContent().get(0).getWriter().getParameter().getIntVal("batchInterval", 1);
+    public StreamWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+        print = writerConfig.getParameter().getBooleanVal("print",false);
+        writeDelimiter = writerConfig.getParameter().getStringVal("writeDelimiter", "|");
+        batchInterval = writerConfig.getParameter().getIntVal("batchInterval", 1);
 
-        List column = config.getJob().getContent().get(0).getWriter().getParameter().getColumn();
+        List column = writerConfig.getParameter().getColumn();
         metaColumns = MetaColumn.getMetaColumns(column);
     }
 

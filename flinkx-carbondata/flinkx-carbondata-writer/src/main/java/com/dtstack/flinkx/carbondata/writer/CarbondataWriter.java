@@ -55,9 +55,9 @@ public class CarbondataWriter extends BaseDataWriter {
 
     protected int batchSize;
 
-    public CarbondataWriter(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public CarbondataWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         hadoopConfig = (Map<String, String>) writerConfig.getParameter().getVal(CarbonConfigKeys.KEY_HADOOP_CONFIG);
         table = writerConfig.getParameter().getStringVal(CarbonConfigKeys.KEY_TABLE);
         database = writerConfig.getParameter().getStringVal(CarbonConfigKeys.KEY_DATABASE);

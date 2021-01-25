@@ -20,6 +20,7 @@ package com.dtstack.flinkx.sqlserver.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.rdb.datawriter.JdbcDataWriter;
 import com.dtstack.flinkx.rdb.outputformat.JdbcOutputFormatBuilder;
 import com.dtstack.flinkx.sqlserver.SqlServerConfigKeys;
@@ -37,11 +38,11 @@ public class SqlserverWriter extends JdbcDataWriter {
     //是否在sql语句后面添加 with(nolock) ,默认是false
     private Boolean withNoLock;
 
-    public SqlserverWriter(DataTransferConfig config) {
-        super(config);
+    public SqlserverWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         setDatabaseInterface(new SqlServerDatabaseMeta());
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
-        withNoLock = readerConfig.getParameter().getBooleanVal(SqlServerConfigKeys.WITH_NO_LOCK,false);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+//        withNoLock = readerConfig.getParameter().getBooleanVal(SqlServerConfigKeys.WITH_NO_LOCK,false);
     }
 
     @Override

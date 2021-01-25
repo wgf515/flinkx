@@ -43,10 +43,10 @@ public class SqlserverReader extends JdbcDataReader {
     //是否在sql语句后面添加 with(nolock) ,默认是false
     private Boolean withNoLock;
 
-    public SqlserverReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public SqlserverReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new SqlServerDatabaseMeta());
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         withNoLock = readerConfig.getParameter().getBooleanVal(SqlServerConfigKeys.WITH_NO_LOCK,false);
     }
 

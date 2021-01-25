@@ -42,10 +42,10 @@ public class StreamReader extends BaseDataReader {
 
     private List<MetaColumn> columns;
 
-    public StreamReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public StreamReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
 
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
 
         sliceRecordCount = new ArrayList<>();
         List list = (List)readerConfig.getParameter().getVal("sliceRecordCount");

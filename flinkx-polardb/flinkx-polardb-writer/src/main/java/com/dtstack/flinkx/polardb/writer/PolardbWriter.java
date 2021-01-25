@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.polardb.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.mysql.writer.MysqlWriter;
 import com.dtstack.flinkx.polardbd.PolardbDatabaseMeta;
 
@@ -28,8 +29,8 @@ import com.dtstack.flinkx.polardbd.PolardbDatabaseMeta;
  * @author tudou
  */
 public class PolardbWriter extends MysqlWriter {
-    public PolardbWriter(DataTransferConfig config) {
-        super(config);
+    public PolardbWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         setDatabaseInterface(new PolardbDatabaseMeta());
     }
 }

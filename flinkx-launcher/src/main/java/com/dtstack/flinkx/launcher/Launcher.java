@@ -21,6 +21,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.dtstack.flinkx.config.ContentConfig;
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.enums.ClusterMode;
 import com.dtstack.flinkx.launcher.perjob.PerJobSubmitter;
 import com.dtstack.flinkx.options.OptionParser;
@@ -80,19 +82,36 @@ public class Launcher {
         Preconditions.checkNotNull(pluginRoot);
 
         ContentConfig contentConfig = config.getJob().getContent().get(0);
-        String readerName = contentConfig.getReader().getName().toLowerCase();
-        File readerDir = new File(pluginRoot + File.separator + readerName);
-        String writerName = contentConfig.getWriter().getName().toLowerCase();
-        File writerDir = new File(pluginRoot + File.separator + writerName);
-        File commonDir = new File(pluginRoot + File.separator + "common");
-
         try {
-            urlList.addAll(SysUtil.findJarsInDir(readerDir));
-            urlList.addAll(SysUtil.findJarsInDir(writerDir));
+            for (ReaderConfig readerConfig : contentConfig.getReader()) {
+                String readerName = readerConfig.getName().toLowerCase();
+                File readerDir = new File(pluginRoot + File.separator + readerName);
+                urlList.addAll(SysUtil.findJarsInDir(readerDir));
+            }
+            for (WriterConfig writerConfig : contentConfig.getWriter()) {
+                String writerName = writerConfig.getName().toLowerCase();
+                File writerDir = new File(pluginRoot + File.separator + writerName);
+                urlList.addAll(SysUtil.findJarsInDir(writerDir));
+            }
+            File commonDir = new File(pluginRoot + File.separator + "common");
             urlList.addAll(SysUtil.findJarsInDir(commonDir));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+
+//        String readerName = contentConfig.getReader().getName().toLowerCase();
+//        File readerDir = new File(pluginRoot + File.separator + readerName);
+//        String writerName = contentConfig.getWriter().getName().toLowerCase();
+//        File writerDir = new File(pluginRoot + File.separator + writerName);
+//        File commonDir = new File(pluginRoot + File.separator + "common");
+//
+//        try {
+//            urlList.addAll(SysUtil.findJarsInDir(readerDir));
+//            urlList.addAll(SysUtil.findJarsInDir(writerDir));
+//            urlList.addAll(SysUtil.findJarsInDir(commonDir));
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException(e);
+//        }
 
         return urlList;
     }

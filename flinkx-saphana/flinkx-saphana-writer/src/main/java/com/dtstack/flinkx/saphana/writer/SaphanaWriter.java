@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.saphana.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.rdb.datawriter.JdbcDataWriter;
 import com.dtstack.flinkx.rdb.outputformat.JdbcOutputFormatBuilder;
 import com.dtstack.flinkx.rdb.util.DbUtil;
@@ -35,8 +36,8 @@ import java.util.Collections;
  */
 public class SaphanaWriter extends JdbcDataWriter {
 
-    public SaphanaWriter(DataTransferConfig config) {
-        super(config);
+    public SaphanaWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         setDatabaseInterface(new SaphanaDatabaseMeta());
         dbUrl = DbUtil.formatJdbcUrl(dbUrl, Collections.singletonMap("zeroDateTimeBehavior", "convertToNull"));
     }

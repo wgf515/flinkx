@@ -94,7 +94,7 @@ public class Main {
 
         // 解析jobPath指定的任务配置文件
         DataTransferConfig config = DataTransferConfig.parse(job);
-        speedTest(config);
+//        speedTest(config);
 
         if (StringUtils.isNotEmpty(monitor)) {
             config.setMonitorUrls(monitor);
@@ -131,15 +131,34 @@ public class Main {
         UserDefinedFunctionRegistry udfRegistry = new UserDefinedFunctionRegistry(tableContext);
         udfRegistry.registerInternalUDFs();
 
-        BaseDataReader dataReader = DataReaderFactory.getDataReader(config, env);
-        DataStream<Row> dataStream = dataReader.readData();
-        if (speedConfig.getReaderChannel() > 0) {
-            dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+        Map<String, DataStream<Row>> readerDataStreams = new HashMap<>();
+
+        List<ReaderConfig> readerConfigs = config.getJob().getContent().get(0).getReader();
+        for (ReaderConfig readerConfig : readerConfigs) {
+            BaseDataReader dataReader = DataReaderFactory.getDataReader(config, readerConfig, env);
+            DataStream<Row> dataStream = dataReader.readData();
+            if (speedConfig.getReaderChannel() > 0) {
+                dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+            }
+
+            if (speedConfig.isRebalance()) {
+                dataStream = dataStream.rebalance();
+            }
+            //生成临时表
+            tableContext.registerDataStream(readerConfig.getStreamName(), dataStream);
+
+            readerDataStreams.put(readerConfig.getStreamName(), dataStream);
         }
 
-        if (speedConfig.isRebalance()) {
-            dataStream = dataStream.rebalance();
-        }
+//        BaseDataReader dataReader = DataReaderFactory.getDataReader(config, env);
+//        DataStream<Row> dataStream = dataReader.readData();
+//        if (speedConfig.getReaderChannel() > 0) {
+//            dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+//        }
+//
+//        if (speedConfig.isRebalance()) {
+//            dataStream = dataStream.rebalance();
+//        }
 
         /*数据处理*/
 
@@ -183,12 +202,19 @@ public class Main {
         //数据处理
         DataStream<Row> dataStream1 = tableContext.toAppendStream(tableContext.sqlQuery(sb.toString()), Row.class);
 
-        BaseDataWriter dataWriter = DataWriterFactory.getDataWriter(config);
+        //多writer构造
+        List<WriterConfig> writerConfigs = config.getJob().getContent().get(0).getWriter();
+        for (WriterConfig writerConfig : writerConfigs) {
+            BaseDataWriter dataWriter = DataWriterFactory.getDataWriter(config, writerConfig);
 
-        DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream1);
-        if (speedConfig.getWriterChannel() > 0) {
-            dataStreamSink.setParallelism(speedConfig.getWriterChannel());
+            //todo 获取sink datastream 输出
+            DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream1);
+            if (speedConfig.getWriterChannel() > 0) {
+                dataStreamSink.setParallelism(speedConfig.getWriterChannel());
+            }
         }
+
+
         if(env instanceof MyLocalStreamEnvironment) {
             if(StringUtils.isNotEmpty(savepointPath)){
                 ((MyLocalStreamEnvironment) env).setSettings(SavepointRestoreSettings.forPath(savepointPath));
@@ -251,18 +277,18 @@ public class Main {
         return config.getJob().getSetting().getRestoreConfig().isStream();
     }
 
-    private static void speedTest(DataTransferConfig config) {
-        TestConfig testConfig = config.getJob().getSetting().getTestConfig();
-        if (READER.equalsIgnoreCase(testConfig.getSpeedTest())) {
-            ContentConfig contentConfig = config.getJob().getContent().get(0);
-            contentConfig.getWriter().setName(STREAM_WRITER);
-        } else if (WRITER.equalsIgnoreCase(testConfig.getSpeedTest())) {
-            ContentConfig contentConfig = config.getJob().getContent().get(0);
-            contentConfig.getReader().setName(STREAM_READER);
-        }
-
-        config.getJob().getSetting().getSpeed().setBytes(-1);
-    }
+//    private static void speedTest(DataTransferConfig config) {
+//        TestConfig testConfig = config.getJob().getSetting().getTestConfig();
+//        if (READER.equalsIgnoreCase(testConfig.getSpeedTest())) {
+//            ContentConfig contentConfig = config.getJob().getContent().get(0);
+//            contentConfig.getWriter().setName(STREAM_WRITER);
+//        } else if (WRITER.equalsIgnoreCase(testConfig.getSpeedTest())) {
+//            ContentConfig contentConfig = config.getJob().getContent().get(0);
+//            contentConfig.getReader().setName(STREAM_READER);
+//        }
+//
+//        config.getJob().getSetting().getSpeed().setBytes(-1);
+//    }
 
     private static void addEnvClassPath(StreamExecutionEnvironment env, Set<URL> classPathSet) throws Exception {
         int i = 0;

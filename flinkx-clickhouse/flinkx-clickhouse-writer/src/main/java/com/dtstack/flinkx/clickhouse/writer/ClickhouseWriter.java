@@ -20,6 +20,7 @@ package com.dtstack.flinkx.clickhouse.writer;
 import com.dtstack.flinkx.clickhouse.core.ClickhouseDatabaseMeta;
 import com.dtstack.flinkx.clickhouse.format.ClickhouseOutputFormat;
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.enums.EWriteMode;
 import com.dtstack.flinkx.rdb.datawriter.JdbcDataWriter;
 import com.dtstack.flinkx.rdb.outputformat.JdbcOutputFormatBuilder;
@@ -32,8 +33,8 @@ import com.dtstack.flinkx.rdb.outputformat.JdbcOutputFormatBuilder;
  */
 public class ClickhouseWriter extends JdbcDataWriter {
 
-    public ClickhouseWriter(DataTransferConfig config) {
-        super(config);
+    public ClickhouseWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         if(config.getJob().getSetting().getSpeed().getChannel() != 1){
             throw new UnsupportedOperationException("clickhouse writer's channel setting must be 1");
         }

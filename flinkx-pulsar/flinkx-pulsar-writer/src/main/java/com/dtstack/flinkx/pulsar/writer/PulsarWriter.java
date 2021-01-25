@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.pulsar.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.writer.BaseDataWriter;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
@@ -41,13 +42,13 @@ public class PulsarWriter extends BaseDataWriter {
     protected Map<String, Object> producerSettings;
 
     @SuppressWarnings("unchecked")
-    public PulsarWriter(DataTransferConfig config){
-        super(config);
-        topic = config.getJob().getContent().get(0).getWriter().getParameter().getStringVal(KEY_TOPIC);
-        token = config.getJob().getContent().get(0).getWriter().getParameter().getStringVal(KEY_TOKEN);
-        pulsarServiceUrl = config.getJob().getContent().get(0).getWriter().getParameter().getStringVal(KEY_PULSAR_SERVICE_URL);
-        producerSettings = (Map<String, Object>) config.getJob().getContent().get(0).getWriter().getParameter().getVal(KEY_PRODUCER_SETTINGS);
-        tableFields = (List<String>)config.getJob().getContent().get(0).getWriter().getParameter().getVal(KEY_TABLE_FIELDS);
+    public PulsarWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+        topic = writerConfig.getParameter().getStringVal(KEY_TOPIC);
+        token = writerConfig.getParameter().getStringVal(KEY_TOKEN);
+        pulsarServiceUrl = writerConfig.getStringVal(KEY_PULSAR_SERVICE_URL);
+        producerSettings = (Map<String, Object>) writerConfig.getParameter().getVal(KEY_PRODUCER_SETTINGS);
+        tableFields = (List<String>) writerConfig.getParameter().getVal(KEY_TABLE_FIELDS);
     }
 
     @Override

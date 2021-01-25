@@ -50,9 +50,9 @@ public class PgwalReader extends BaseDataReader {
     private boolean temporary;
 
     @SuppressWarnings("unchecked")
-    public PgwalReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public PgwalReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         username = readerConfig.getParameter().getStringVal(PgWalConfigKeys.KEY_USER_NAME);
         password = readerConfig.getParameter().getStringVal(PgWalConfigKeys.KEY_PASSWORD);
         url = readerConfig.getParameter().getStringVal(PgWalConfigKeys.KEY_URL);

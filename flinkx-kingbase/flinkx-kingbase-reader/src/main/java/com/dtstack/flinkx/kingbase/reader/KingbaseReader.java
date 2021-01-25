@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.kingbase.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.kingbase.KingbaseDatabaseMeta;
 import com.dtstack.flinkx.kingbase.format.KingbaseInputFormat;
 import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
@@ -26,8 +27,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 public class KingbaseReader extends JdbcDataReader {
 
-    public KingbaseReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public KingbaseReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new KingbaseDatabaseMeta());
     }
 

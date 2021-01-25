@@ -46,9 +46,9 @@ public class EmqxWriter extends BaseDataWriter {
     private boolean isCleanSession;
     private int qos;
 
-    public EmqxWriter(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public EmqxWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         broker = writerConfig.getParameter().getStringVal(KEY_BROKER);
         topic = writerConfig.getParameter().getStringVal(KEY_TOPIC);
         username = writerConfig.getParameter().getStringVal(KEY_USERNAME);

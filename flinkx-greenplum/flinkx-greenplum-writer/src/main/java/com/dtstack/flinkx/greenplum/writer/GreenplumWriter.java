@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.greenplum.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.greenplum.format.GreenplumOutputFormat;
 import com.dtstack.flinkx.postgresql.PostgresqlTypeConverter;
 import com.dtstack.flinkx.rdb.datawriter.JdbcDataWriter;
@@ -43,8 +44,8 @@ public class GreenplumWriter extends JdbcDataWriter {
     public static final String JDBC_POSTGRESQL_PREFIX = "jdbc:postgresql";
     public static final String JDBC_GREENPLUM_PREFIX = "jdbc:pivotal:greenplum";
 
-    public GreenplumWriter(DataTransferConfig config) {
-        super(config);
+    public GreenplumWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         //统一固定为copy模式
         insertSqlMode = INSERT_SQL_MODE_TYPE;
         dbUrl = changeToPostgresqlUrl();

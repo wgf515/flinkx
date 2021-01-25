@@ -35,8 +35,8 @@ import java.util.Collections;
  */
 public class MysqldReader extends DistributedJdbcDataReader {
 
-    public MysqldReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public MysqldReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new MySqlDatabaseMeta());
     }
 

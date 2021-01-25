@@ -41,10 +41,10 @@ public class MongodbReader extends BaseDataReader {
 
     private MongodbConfig mongodbConfig;
 
-    public MongodbReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public MongodbReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
 
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         metaColumns = MetaColumn.getMetaColumns(readerConfig.getParameter().getColumn());
 
         try {

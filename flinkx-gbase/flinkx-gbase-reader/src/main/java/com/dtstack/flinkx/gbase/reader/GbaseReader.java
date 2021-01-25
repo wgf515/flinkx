@@ -20,6 +20,7 @@
 package com.dtstack.flinkx.gbase.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.gbase.GbaseDatabaseMeta;
 import com.dtstack.flinkx.gbase.format.GbaseInputFormat;
 import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
@@ -32,8 +33,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  */
 public class GbaseReader extends JdbcDataReader {
 
-    public GbaseReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public GbaseReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new GbaseDatabaseMeta());
     }
 

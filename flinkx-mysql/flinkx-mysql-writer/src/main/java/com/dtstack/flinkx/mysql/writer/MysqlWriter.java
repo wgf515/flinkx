@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.mysql.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.mysql.MySqlDatabaseMeta;
 import com.dtstack.flinkx.mysql.format.MysqlOutputFormat;
 import com.dtstack.flinkx.rdb.datawriter.JdbcDataWriter;
@@ -35,8 +36,8 @@ import java.util.Collections;
  */
 public class MysqlWriter extends JdbcDataWriter {
 
-    public MysqlWriter(DataTransferConfig config) {
-        super(config);
+    public MysqlWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         setDatabaseInterface(new MySqlDatabaseMeta());
         dbUrl = DbUtil.formatJdbcUrl(dbUrl, Collections.singletonMap("zeroDateTimeBehavior", "convertToNull"));
     }

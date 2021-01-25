@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.db2.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.db2.Db2DatabaseMeta;
 import com.dtstack.flinkx.db2.format.Db2OutputFormat;
 import com.dtstack.flinkx.rdb.datawriter.JdbcDataWriter;
@@ -32,8 +33,8 @@ import com.dtstack.flinkx.rdb.outputformat.JdbcOutputFormatBuilder;
  */
 public class Db2Writer extends JdbcDataWriter {
 
-    public Db2Writer(DataTransferConfig config) {
-        super(config);
+    public Db2Writer(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         setDatabaseInterface(new Db2DatabaseMeta());
     }
 

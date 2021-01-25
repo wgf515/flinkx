@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.kafka.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.kafkabase.writer.KafkaBaseWriter;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
@@ -32,8 +33,8 @@ import org.apache.kafka.clients.producer.ProducerConfig;
  */
 public class KafkaWriter extends KafkaBaseWriter {
 
-    public KafkaWriter(DataTransferConfig config) {
-        super(config);
+    public KafkaWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         if (!producerSettings.containsKey(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG)) {
             throw new IllegalArgumentException(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG + " must set in producerSettings");
         }

@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.polardbd.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.mysqld.reader.MysqldReader;
 import com.dtstack.flinkx.polardbd.PolardbDatabaseMeta;
 import com.dtstack.flinkx.polardbd.format.PolardbdInputFormat;
@@ -31,8 +32,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * @author tudou
  */
 public class PolardbdReader extends MysqldReader {
-    public PolardbdReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public PolardbdReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new PolardbDatabaseMeta());
     }
 

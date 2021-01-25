@@ -80,11 +80,11 @@ public class JdbcDataWriter extends BaseDataWriter {
     }
 
     @SuppressWarnings("unchecked")
-    public JdbcDataWriter(DataTransferConfig config) {
+    public JdbcDataWriter(DataTransferConfig config, WriterConfig writerConfig) {
 
-        super(config);
+        super(config, writerConfig);
 
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
 
         dbUrl = writerConfig.getParameter().getConnection().get(0).getJdbcUrl();
         username = writerConfig.getParameter().getStringVal(KEY_USERNAME);

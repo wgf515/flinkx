@@ -46,9 +46,9 @@ public class OdpsReader extends BaseDataReader {
     protected String partition;
 
 
-    public OdpsReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public OdpsReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         odpsConfig = (Map<String, String>) readerConfig.getParameter().getVal(KEY_ODPS_CONFIG);
         tableName = readerConfig.getParameter().getStringVal(KEY_TABLE);
         partition = readerConfig.getParameter().getStringVal(KEY_PARTITION);

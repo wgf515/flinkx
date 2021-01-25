@@ -69,10 +69,10 @@ public class CassandraReader extends BaseDataReader {
     protected Map<String,Object> cassandraConfig;
 
 
-    public CassandraReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public CassandraReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
 
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         host = readerConfig.getParameter().getStringVal(KEY_HOST);
         port = readerConfig.getParameter().getIntVal(KEY_PORT, 9042);
         username = readerConfig.getParameter().getStringVal(KEY_USERNAME);

@@ -56,9 +56,9 @@ public class HbaseReader extends BaseDataReader {
     protected int scanCacheSize;
     protected int scanBatchSize;
 
-    public HbaseReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public HbaseReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         tableName = readerConfig.getParameter().getStringVal(HbaseConfigKeys.KEY_TABLE);
         hbaseConfig = (Map<String, Object>) readerConfig.getParameter().getVal(HbaseConfigKeys.KEY_HBASE_CONFIG);
 

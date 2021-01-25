@@ -36,8 +36,9 @@ import java.util.List;
 
 /**
  * The Reader plugin for any database that can be connected via JDBC.
- *
+ * <p>
  * Company: www.dtstack.com
+ *
  * @author huyifan.zju@163.com
  */
 public class JdbcDataReader extends BaseDataReader {
@@ -78,21 +79,21 @@ public class JdbcDataReader extends BaseDataReader {
         this.typeConverter = typeConverter;
     }
 
-    public JdbcDataReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public JdbcDataReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
 
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         dbUrl = readerConfig.getParameter().getConnection().get(0).getJdbcUrl().get(0);
         username = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_USER_NAME);
         password = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_PASSWORD);
         table = readerConfig.getParameter().getConnection().get(0).getTable().get(0);
         where = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_WHERE);
         metaColumns = MetaColumn.getMetaColumns(readerConfig.getParameter().getColumn());
-        fetchSize = readerConfig.getParameter().getIntVal(JdbcConfigKeys.KEY_FETCH_SIZE,0);
-        queryTimeOut = readerConfig.getParameter().getIntVal(JdbcConfigKeys.KEY_QUERY_TIME_OUT,0);
+        fetchSize = readerConfig.getParameter().getIntVal(JdbcConfigKeys.KEY_FETCH_SIZE, 0);
+        queryTimeOut = readerConfig.getParameter().getIntVal(JdbcConfigKeys.KEY_QUERY_TIME_OUT, 0);
         splitKey = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_SPLIK_KEY);
-        customSql = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_CUSTOM_SQL,null);
-        orderByColumn = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_ORDER_BY_COLUMN,null);
+        customSql = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_CUSTOM_SQL, null);
+        orderByColumn = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_ORDER_BY_COLUMN, null);
 
         buildIncrementConfig(readerConfig);
     }
@@ -125,7 +126,7 @@ public class JdbcDataReader extends BaseDataReader {
         QuerySqlBuilder sqlBuilder = new QuerySqlBuilder(this);
         builder.setQuery(sqlBuilder.buildSql());
 
-        BaseRichInputFormat format =  builder.finish();
+        BaseRichInputFormat format = builder.finish();
 //        (databaseInterface.getDatabaseType() + "reader").toLowerCase()
         return createInput(format);
     }
@@ -134,29 +135,29 @@ public class JdbcDataReader extends BaseDataReader {
         throw new RuntimeException("子类必须覆盖getBuilder方法");
     }
 
-    private void buildIncrementConfig(ReaderConfig readerConfig){
+    private void buildIncrementConfig(ReaderConfig readerConfig) {
         boolean polling = readerConfig.getParameter().getBooleanVal(JdbcConfigKeys.KEY_POLLING, false);
         Object incrementColumn = readerConfig.getParameter().getVal(JdbcConfigKeys.KEY_INCRE_COLUMN);
-        String startLocation = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_START_LOCATION,null);
+        String startLocation = readerConfig.getParameter().getStringVal(JdbcConfigKeys.KEY_START_LOCATION, null);
         boolean useMaxFunc = readerConfig.getParameter().getBooleanVal(JdbcConfigKeys.KEY_USE_MAX_FUNC, false);
         int requestAccumulatorInterval = readerConfig.getParameter().getIntVal(JdbcConfigKeys.KEY_REQUEST_ACCUMULATOR_INTERVAL, 2);
         long pollingInterval = readerConfig.getParameter().getLongVal(JdbcConfigKeys.KEY_POLLING_INTERVAL, 5000);
 
         incrementConfig = new IncrementConfig();
-        if (incrementColumn != null && StringUtils.isNotEmpty(incrementColumn.toString())){
+        if (incrementColumn != null && StringUtils.isNotEmpty(incrementColumn.toString())) {
             String type = null;
             String name = null;
             int index = -1;
 
             String incrementColStr = String.valueOf(incrementColumn);
-            if(NumberUtils.isNumber(incrementColStr)){
+            if (NumberUtils.isNumber(incrementColStr)) {
                 MetaColumn metaColumn = metaColumns.get(Integer.parseInt(incrementColStr));
                 type = metaColumn.getType();
                 name = metaColumn.getName();
                 index = metaColumn.getIndex();
             } else {
                 for (MetaColumn metaColumn : metaColumns) {
-                    if(metaColumn.getName().equals(incrementColStr)){
+                    if (metaColumn.getName().equals(incrementColStr)) {
                         type = metaColumn.getType();
                         name = metaColumn.getName();
                         index = metaColumn.getIndex() == null ? index : metaColumn.getIndex();

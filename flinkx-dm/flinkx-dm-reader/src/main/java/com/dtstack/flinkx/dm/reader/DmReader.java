@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.dm.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.dm.DmDatabaseMeta;
 import com.dtstack.flinkx.dm.format.DmInputFormat;
 import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
@@ -32,8 +33,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  */
 public class DmReader extends JdbcDataReader {
 
-    public DmReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public DmReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new DmDatabaseMeta());
     }
 

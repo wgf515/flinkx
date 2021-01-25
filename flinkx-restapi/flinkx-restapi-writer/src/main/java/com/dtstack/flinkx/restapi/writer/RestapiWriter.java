@@ -53,11 +53,11 @@ public class RestapiWriter extends BaseDataWriter {
     protected int batchInterval;
 
     @SuppressWarnings("unchecked")
-    public RestapiWriter(DataTransferConfig config) {
-        super(config);
+    public RestapiWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         Object tempObj;
 
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
 
         url = writerConfig.getParameter().getStringVal(RestapiKeys.KEY_URL);
         method = writerConfig.getParameter().getStringVal(RestapiKeys.KEY_METHOD);

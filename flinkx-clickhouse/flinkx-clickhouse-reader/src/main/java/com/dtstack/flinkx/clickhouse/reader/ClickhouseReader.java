@@ -20,6 +20,7 @@ package com.dtstack.flinkx.clickhouse.reader;
 import com.dtstack.flinkx.clickhouse.core.ClickhouseDatabaseMeta;
 import com.dtstack.flinkx.clickhouse.format.ClickhouseInputFormat;
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
 import com.dtstack.flinkx.rdb.inputformat.JdbcInputFormatBuilder;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -31,8 +32,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  */
 public class ClickhouseReader extends JdbcDataReader {
 
-    public ClickhouseReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public ClickhouseReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new ClickhouseDatabaseMeta());
     }
 

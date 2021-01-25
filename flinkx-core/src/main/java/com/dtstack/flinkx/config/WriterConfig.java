@@ -34,6 +34,8 @@ public class WriterConfig extends AbstractConfig {
 
     public static String KEY_PARAMETER_CONFIG = "parameter";
     public static String KEY_WRITER_NAME = "name";
+    public static final String KEY_STREAM_NAME = "streamname";
+
 
     ParameterConfig parameter;
 
@@ -56,6 +58,14 @@ public class WriterConfig extends AbstractConfig {
 
     public void setParameter(ParameterConfig parameter) {
         this.parameter = parameter;
+    }
+
+    public String getStreamName() {
+        return getStringVal(KEY_STREAM_NAME);
+    }
+
+    public void setStreamName(String name) {
+        setStringVal(KEY_STREAM_NAME, name);
     }
 
     public static class ParameterConfig extends AbstractConfig {

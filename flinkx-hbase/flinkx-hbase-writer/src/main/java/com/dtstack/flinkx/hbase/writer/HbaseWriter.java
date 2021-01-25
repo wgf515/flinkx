@@ -71,9 +71,9 @@ public class HbaseWriter extends BaseDataWriter {
     private Integer versionColumnIndex;
     private String versionColumnValue;
 
-    public HbaseWriter(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public HbaseWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
 
         tableName = writerConfig.getParameter().getStringVal(KEY_TABLE);
         hbaseConfig = (Map<String, Object>) writerConfig.getParameter().getVal(KEY_HBASE_CONFIG);

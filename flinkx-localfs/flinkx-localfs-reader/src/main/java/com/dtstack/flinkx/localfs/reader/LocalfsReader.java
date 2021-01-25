@@ -39,9 +39,9 @@ public class LocalfsReader extends BaseDataReader {
 
     private String encoder;
 
-    public LocalfsReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public LocalfsReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         path = readerConfig.getParameter().getStringVal("path");
         encoder = readerConfig.getParameter().getStringVal("encoder", "UTF-8");
         columns = MetaColumn.getMetaColumns(readerConfig.getParameter().getColumn());

@@ -32,9 +32,9 @@ public class EmqxReader extends BaseDataReader {
     private boolean isCleanSession;
     private int qos;
 
-    public EmqxReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public EmqxReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         broker = readerConfig.getParameter().getStringVal(KEY_BROKER);
         topic = readerConfig.getParameter().getStringVal(KEY_TOPIC);
         username = readerConfig.getParameter().getStringVal(KEY_USERNAME);

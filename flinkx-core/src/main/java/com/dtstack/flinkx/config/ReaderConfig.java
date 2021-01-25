@@ -34,6 +34,8 @@ public class ReaderConfig extends AbstractConfig {
 
     public static final String KEY_READER_NAME = "name";
 
+    public static final String KEY_STREAM_NAME = "streamname";
+
     private ParameterConfig parameter;
 
     public ReaderConfig(Map<String, Object> map) {
@@ -47,6 +49,14 @@ public class ReaderConfig extends AbstractConfig {
 
     public void setName(String name) {
         setStringVal(KEY_READER_NAME, name);
+    }
+
+    public String getStreamName() {
+        return getStringVal(KEY_STREAM_NAME);
+    }
+
+    public void setStreamName(String name) {
+        setStringVal(KEY_STREAM_NAME, name);
     }
 
     public ParameterConfig getParameter() {

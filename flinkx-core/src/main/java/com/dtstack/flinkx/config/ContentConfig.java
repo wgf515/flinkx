@@ -18,6 +18,8 @@
 
 package com.dtstack.flinkx.config;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,30 +33,38 @@ public class ContentConfig extends AbstractConfig {
     public final static String KEY_READER_CONFIG = "reader";
     public final static String KEY_WRITER_CONFIG = "writer";
 
-    ReaderConfig reader;
-    WriterConfig writer;
+    List<ReaderConfig> reader = new ArrayList<>();
+    List<WriterConfig> writer = new ArrayList<>();
 
     public ContentConfig(Map<String, Object> map) {
         super(map);
         if(map != null) {
-            reader = new ReaderConfig((Map<String, Object>) map.get(KEY_READER_CONFIG));
-            writer = new WriterConfig((Map<String, Object>) map.get(KEY_WRITER_CONFIG));
+            List<Map<String,Object>> readerList = (List<Map<String, Object>>) map.get(KEY_READER_CONFIG);
+            List<Map<String,Object>> writerList = (List<Map<String, Object>>) map.get(KEY_WRITER_CONFIG);
+            for(Map<String,Object> readerMap : readerList) {
+                reader.add(new ReaderConfig(readerMap));
+            }
+            for(Map<String,Object> writerMap : writerList) {
+                writer.add(new WriterConfig(writerMap));
+            }
+//            reader = new ReaderConfig((Map<String, Object>) map.get(KEY_READER_CONFIG));
+//            writer = new WriterConfig((Map<String, Object>) map.get(KEY_WRITER_CONFIG));
         }
     }
 
-    public ReaderConfig getReader() {
+    public List<ReaderConfig> getReader() {
         return reader;
     }
 
-    public void setReader(ReaderConfig reader) {
+    public void setReader(List<ReaderConfig> reader) {
         this.reader = reader;
     }
 
-    public WriterConfig getWriter() {
+    public List<WriterConfig> getWriter() {
         return writer;
     }
 
-    public void setWriter(WriterConfig writer) {
+    public void setWriter(List<WriterConfig> writer) {
         this.writer = writer;
     }
 

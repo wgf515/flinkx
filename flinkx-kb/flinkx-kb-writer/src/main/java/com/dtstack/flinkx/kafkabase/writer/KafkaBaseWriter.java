@@ -46,9 +46,9 @@ public class KafkaBaseWriter extends BaseDataWriter {
     protected Map<String, String> hadoopConfig;
 
     @SuppressWarnings("unchecked")
-    public KafkaBaseWriter(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public KafkaBaseWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         timezone = writerConfig.getParameter().getStringVal(KEY_TIMEZONE);
         topic = writerConfig.getParameter().getStringVal(KEY_TOPIC);
         producerSettings = (Map<String, String>) writerConfig.getParameter().getVal(KEY_PRODUCER_SETTINGS);

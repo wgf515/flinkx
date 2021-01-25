@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.kafka.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.kafkabase.reader.KafkaBaseInputFormat;
 import com.dtstack.flinkx.kafkabase.reader.KafkaBaseReader;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -31,8 +32,8 @@ import org.apache.kafka.clients.producer.ProducerConfig;
  */
 public class KafkaReader extends KafkaBaseReader {
 
-    public KafkaReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public KafkaReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         if (!consumerSettings.containsKey(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG)) {
             throw new IllegalArgumentException(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG + " must set in consumerSettings");
         }

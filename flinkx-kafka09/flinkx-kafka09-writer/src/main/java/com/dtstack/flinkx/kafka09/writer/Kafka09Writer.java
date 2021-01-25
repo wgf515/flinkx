@@ -38,9 +38,9 @@ public class Kafka09Writer extends KafkaBaseWriter {
     private String encoding;
     private String brokerList;
 
-    public Kafka09Writer(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public Kafka09Writer(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         encoding = writerConfig.getParameter().getStringVal(KafkaConfigKeys.KEY_ENCODING, StandardCharsets.UTF_8.name());
         brokerList = writerConfig.getParameter().getStringVal(KafkaConfigKeys.KEY_BROKER_LIST);
         if (StringUtils.isBlank(brokerList)) {

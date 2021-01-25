@@ -19,6 +19,8 @@
 package com.dtstack.flinkx.greenplum.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
+import com.dtstack.flinkx.greenplum.GreenplumDatabaseMeta;
 import com.dtstack.flinkx.greenplum.format.GreenplumInputFormat;
 import com.dtstack.flinkx.inputformat.BaseRichInputFormat;
 import com.dtstack.flinkx.postgresql.PostgresqlTypeConverter;
@@ -26,7 +28,6 @@ import com.dtstack.flinkx.postgresql.reader.PostgresqlQuerySqlBuilder;
 import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
 import com.dtstack.flinkx.rdb.datareader.QuerySqlBuilder;
 import com.dtstack.flinkx.rdb.inputformat.JdbcInputFormatBuilder;
-import com.dtstack.flinkx.greenplum.GreenplumDatabaseMeta;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.types.Row;
@@ -39,8 +40,8 @@ import org.apache.flink.types.Row;
  */
 
 public class GreenplumReader extends JdbcDataReader {
-    public GreenplumReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public GreenplumReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new GreenplumDatabaseMeta());
         setTypeConverterInterface(new PostgresqlTypeConverter());
     }

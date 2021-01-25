@@ -27,6 +27,7 @@ import com.dtstack.flinkx.carbondata.writer.CarbondataWriter;
 import com.dtstack.flinkx.clickhouse.reader.ClickhouseReader;
 import com.dtstack.flinkx.clickhouse.writer.ClickhouseWriter;
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.config.SpeedConfig;
 import com.dtstack.flinkx.constants.ConfigConstant;
 import com.dtstack.flinkx.db2.reader.Db2Reader;
@@ -183,20 +184,31 @@ public class LocalTest {
         UserDefinedFunctionRegistry udfRegistry = new UserDefinedFunctionRegistry(tableContext);
         udfRegistry.registerInternalUDFs();
 
+        List<ReaderConfig> readerConfigs = config.getJob().getContent().get(0).getReader();
+        for (ReaderConfig readerConfig : readerConfigs) {
+            BaseDataReader reader = buildDataReader(config, readerConfig, env);
+            DataStream<Row> dataStream = reader.readData();
+            SpeedConfig speedConfig = config.getJob().getSetting().getSpeed();
+            if (speedConfig.getReaderChannel() > 0) {
+                dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+            }
 
-        BaseDataReader reader = buildDataReader(config, env);
-        DataStream<Row> dataStream = reader.readData();
-        SpeedConfig speedConfig = config.getJob().getSetting().getSpeed();
-        if (speedConfig.getReaderChannel() > 0) {
-            dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+            dataStream = new DataStream<>(dataStream.getExecutionEnvironment(),
+                    new PartitionTransformation<>(dataStream.getTransformation(),
+                            new CustomPartitioner<>()));
+
+            tableContext.registerDataStream(readerConfig.getStreamName(), dataStream);
         }
-
-        dataStream = new DataStream<>(dataStream.getExecutionEnvironment(),
-                new PartitionTransformation<>(dataStream.getTransformation(),
-                        new CustomPartitioner<>()));
-
-        LOG.info("dataStream size: " + dataStream.getType().getArity());
-        LOG.info("dataStream type:" + dataStream.getType());
+//        BaseDataReader reader = buildDataReader(config, env);
+//        DataStream<Row> dataStream = reader.readData();
+//        SpeedConfig speedConfig = config.getJob().getSetting().getSpeed();
+//        if (speedConfig.getReaderChannel() > 0) {
+//            dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+//        }
+//
+//        dataStream = new DataStream<>(dataStream.getExecutionEnvironment(),
+//                new PartitionTransformation<>(dataStream.getTransformation(),
+//                        new CustomPartitioner<>()));
 
         /*数据处理*/
 
@@ -233,12 +245,7 @@ public class LocalTest {
 
         LOG.info("rowTypeInfo: " + rowTypeInfo);
 
-        SingleOutputStreamOperator<Row> streamOperator = dataStream.map(new MapFunction<Row, Row>() {
-            @Override
-            public Row map(Row row) throws Exception {
-                return row;
-            }
-        }).returns(rowTypeInfo);
+        SingleOutputStreamOperator<Row> streamOperator = dataStream.map((MapFunction<Row, Row>) row -> row).returns(rowTypeInfo);
 
         LOG.info("fields size is :" + fields.size());
 
@@ -288,39 +295,39 @@ public class LocalTest {
         }
     }
 
-    private static BaseDataReader buildDataReader(DataTransferConfig config, StreamExecutionEnvironment env){
-        String readerName = config.getJob().getContent().get(0).getReader().getName();
+    private static BaseDataReader buildDataReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env){
+        String readerName = readerConfig.getName();
         BaseDataReader reader ;
         switch (readerName){
-            case PluginNameConstants.STREAM_READER : reader = new StreamReader(config, env); break;
-            case PluginNameConstants.CARBONDATA_READER : reader = new CarbondataReader(config, env); break;
-            case PluginNameConstants.ORACLE_READER : reader = new OracleReader(config, env); break;
-            case PluginNameConstants.POSTGRESQL_READER : reader = new PostgresqlReader(config, env); break;
-            case PluginNameConstants.SQLSERVER_READER : reader = new SqlserverReader(config, env); break;
-            case PluginNameConstants.MYSQLD_READER : reader = new MysqldReader(config, env); break;
-            case PluginNameConstants.MYSQL_READER : reader = new MysqlReader(config, env); break;
-            case PluginNameConstants.DB2_READER : reader = new Db2Reader(config, env); break;
-            case PluginNameConstants.GBASE_READER : reader = new GbaseReader(config, env); break;
-            case PluginNameConstants.ES_READER : reader = new EsReader(config, env); break;
-            case PluginNameConstants.FTP_READER : reader = new FtpReader(config, env); break;
-            case PluginNameConstants.HBASE_READER : reader = new HbaseReader(config, env); break;
-            case PluginNameConstants.HDFS_READER : reader = new HdfsReader(config, env); break;
-            case PluginNameConstants.MONGODB_READER : reader = new MongodbReader(config, env); break;
-            case PluginNameConstants.ODPS_READER : reader = new OdpsReader(config, env); break;
-            case PluginNameConstants.BINLOG_READER : reader = new BinlogReader(config, env); break;
-            case PluginNameConstants.KAFKA09_READER : reader = new Kafka09Reader(config, env); break;
-            case PluginNameConstants.KAFKA10_READER : reader = new Kafka10Reader(config, env); break;
-            case PluginNameConstants.KAFKA11_READER : reader = new Kafka11Reader(config, env); break;
-            case PluginNameConstants.KAFKA_READER : reader = new KafkaReader(config, env); break;
-            case PluginNameConstants.KUDU_READER : reader = new KuduReader(config, env); break;
-            case PluginNameConstants.CLICKHOUSE_READER : reader = new ClickhouseReader(config, env); break;
-            case PluginNameConstants.POLARDB_READER : reader = new PolardbReader(config, env); break;
-            case PluginNameConstants.PHOENIX_READER : reader = new PhoenixReader(config, env); break;
-            case PluginNameConstants.EMQX_READER : reader = new EmqxReader(config, env); break;
-            case PluginNameConstants.DM_READER : reader = new DmReader(config, env); break;
-            case PluginNameConstants.GREENPLUM_READER : reader = new GreenplumReader(config, env); break;
-            case PluginNameConstants.LOCALFS_READER : reader = new LocalfsReader(config, env); break;
-            case PluginNameConstants.KINGBASE_READER : reader = new KingbaseReader(config, env); break;
+            case PluginNameConstants.STREAM_READER : reader = new StreamReader(config, readerConfig, env); break;
+            case PluginNameConstants.CARBONDATA_READER : reader = new CarbondataReader(config, readerConfig, env); break;
+            case PluginNameConstants.ORACLE_READER : reader = new OracleReader(config, readerConfig, env); break;
+            case PluginNameConstants.POSTGRESQL_READER : reader = new PostgresqlReader(config, readerConfig, env); break;
+            case PluginNameConstants.SQLSERVER_READER : reader = new SqlserverReader(config, readerConfig, env); break;
+            case PluginNameConstants.MYSQLD_READER : reader = new MysqldReader(config, readerConfig, env); break;
+            case PluginNameConstants.MYSQL_READER : reader = new MysqlReader(config, readerConfig, env); break;
+            case PluginNameConstants.DB2_READER : reader = new Db2Reader(config, readerConfig, env); break;
+            case PluginNameConstants.GBASE_READER : reader = new GbaseReader(config, readerConfig, env); break;
+            case PluginNameConstants.ES_READER : reader = new EsReader(config, readerConfig, env); break;
+            case PluginNameConstants.FTP_READER : reader = new FtpReader(config, readerConfig, env); break;
+            case PluginNameConstants.HBASE_READER : reader = new HbaseReader(config, readerConfig, env); break;
+            case PluginNameConstants.HDFS_READER : reader = new HdfsReader(config, readerConfig, env); break;
+            case PluginNameConstants.MONGODB_READER : reader = new MongodbReader(config, readerConfig, env); break;
+            case PluginNameConstants.ODPS_READER : reader = new OdpsReader(config, readerConfig, env); break;
+            case PluginNameConstants.BINLOG_READER : reader = new BinlogReader(config, readerConfig, env); break;
+            case PluginNameConstants.KAFKA09_READER : reader = new Kafka09Reader(config, readerConfig, env); break;
+            case PluginNameConstants.KAFKA10_READER : reader = new Kafka10Reader(config, readerConfig, env); break;
+            case PluginNameConstants.KAFKA11_READER : reader = new Kafka11Reader(config, readerConfig, env); break;
+            case PluginNameConstants.KAFKA_READER : reader = new KafkaReader(config, readerConfig, env); break;
+            case PluginNameConstants.KUDU_READER : reader = new KuduReader(config, readerConfig, env); break;
+            case PluginNameConstants.CLICKHOUSE_READER : reader = new ClickhouseReader(config, readerConfig, env); break;
+            case PluginNameConstants.POLARDB_READER : reader = new PolardbReader(config, readerConfig, env); break;
+            case PluginNameConstants.PHOENIX_READER : reader = new PhoenixReader(config, readerConfig, env); break;
+            case PluginNameConstants.EMQX_READER : reader = new EmqxReader(config, readerConfig, env); break;
+            case PluginNameConstants.DM_READER : reader = new DmReader(config, readerConfig, env); break;
+            case PluginNameConstants.GREENPLUM_READER : reader = new GreenplumReader(config, readerConfig, env); break;
+            case PluginNameConstants.LOCALFS_READER : reader = new LocalfsReader(config, readerConfig, env); break;
+            case PluginNameConstants.KINGBASE_READER : reader = new KingbaseReader(config, readerConfig, env); break;
             default:throw new IllegalArgumentException("Can not find reader by name:" + readerName);
         }
 

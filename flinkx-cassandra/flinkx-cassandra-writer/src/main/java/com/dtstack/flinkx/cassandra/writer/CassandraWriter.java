@@ -67,9 +67,9 @@ public class CassandraWriter extends BaseDataWriter {
     protected Map<String,Object> cassandraConfig;
 
 
-    public CassandraWriter(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public CassandraWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         host = writerConfig.getParameter().getStringVal(KEY_HOST);
         port = writerConfig.getParameter().getIntVal(KEY_PORT, 9042);
         username = writerConfig.getParameter().getStringVal(KEY_USERNAME);

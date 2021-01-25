@@ -61,9 +61,9 @@ public class CarbondataReader extends BaseDataReader {
     protected String filter;
 
 
-    public CarbondataReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public CarbondataReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         hadoopConfig = (Map<String, String>) readerConfig.getParameter().getVal(CarbonConfigKeys.KEY_HADOOP_CONFIG);
         table = readerConfig.getParameter().getStringVal(CarbonConfigKeys.KEY_TABLE);
         database = readerConfig.getParameter().getStringVal(CarbonConfigKeys.KEY_DATABASE);

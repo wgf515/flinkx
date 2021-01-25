@@ -44,9 +44,9 @@ public class RestapiReader extends BaseDataReader {
     private ArrayList<Map<String, String>> temp;
 
     @SuppressWarnings("unchecked")
-    public RestapiReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public RestapiReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
 
         url = readerConfig.getParameter().getStringVal("url");
         method = readerConfig.getParameter().getStringVal("method");

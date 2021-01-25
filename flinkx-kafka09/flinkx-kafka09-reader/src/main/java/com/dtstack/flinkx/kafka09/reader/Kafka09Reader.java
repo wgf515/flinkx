@@ -34,9 +34,9 @@ import java.nio.charset.StandardCharsets;
 public class Kafka09Reader extends KafkaBaseReader {
     private String encoding;
 
-    public Kafka09Reader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public Kafka09Reader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         encoding = readerConfig.getParameter().getStringVal(KafkaConfigKeys.KEY_ENCODING, StandardCharsets.UTF_8.name());
     }
 

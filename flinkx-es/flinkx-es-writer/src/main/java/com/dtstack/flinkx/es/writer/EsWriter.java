@@ -54,9 +54,9 @@ public class EsWriter extends BaseDataWriter {
     private List<String> idColumnTypes;
     private List<String> idColumnValues;
 
-    public EsWriter(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public EsWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         address = writerConfig.getParameter().getStringVal(EsConfigKeys.KEY_ADDRESS);
         username = writerConfig.getParameter().getStringVal(EsConfigKeys.KEY_USERNAME);
         password = writerConfig.getParameter().getStringVal(EsConfigKeys.KEY_PASSWORD);

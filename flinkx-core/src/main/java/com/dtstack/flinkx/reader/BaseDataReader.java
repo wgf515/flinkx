@@ -18,11 +18,7 @@
 
 package com.dtstack.flinkx.reader;
 
-import com.dtstack.flinkx.config.DataTransferConfig;
-import com.dtstack.flinkx.config.LogConfig;
-import com.dtstack.flinkx.config.RestoreConfig;
-import com.dtstack.flinkx.config.DirtyConfig;
-import com.dtstack.flinkx.config.TestConfig;
+import com.dtstack.flinkx.config.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.apache.flink.api.common.io.InputFormat;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -89,7 +85,7 @@ public abstract class BaseDataReader {
         this.srcCols = srcCols;
     }
 
-    protected BaseDataReader(DataTransferConfig config, StreamExecutionEnvironment env) {
+    protected BaseDataReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
         this.env = env;
         this.dataTransferConfig = config;
         this.numPartitions = config.getJob().getSetting().getSpeed().getChannel();
@@ -114,7 +110,8 @@ public abstract class BaseDataReader {
         }
 
         if(restoreConfig.isRestore()){
-            List columns = config.getJob().getContent().get(0).getReader().getParameter().getColumn();
+//            List columns = config.getJob().getContent().get(0).getReader().getParameter().getColumn();
+            List columns = readerConfig.getParameter().getColumn();
             MetaColumn metaColumn = MetaColumn.getMetaColumn(columns, restoreConfig.getRestoreColumnName());
             if(metaColumn == null){
                 throw new RuntimeException("Can not find restore column from json with column name:" + restoreConfig.getRestoreColumnName());

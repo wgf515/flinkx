@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.phoenix.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.phoenix.PhoenixMeta;
 import com.dtstack.flinkx.phoenix.format.PhoenixInputFormat;
 import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
@@ -36,8 +37,8 @@ import java.util.Collections;
  */
 public class PhoenixReader extends JdbcDataReader {
 
-    public PhoenixReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public PhoenixReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new PhoenixMeta());
         dbUrl = DbUtil.formatJdbcUrl(dbUrl, Collections.singletonMap("zeroDateTimeBehavior", "convertToNull"));
     }

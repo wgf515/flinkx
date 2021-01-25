@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.oracle.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.oracle.OracleDatabaseMeta;
 import com.dtstack.flinkx.oracle.format.OracleInputFormat;
 import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
@@ -27,14 +28,15 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 /**
  * Oracle reader plugin
- *
+ * <p>
  * Company: www.dtstack.com
+ *
  * @author huyifan.zju@163.com
  */
 public class OracleReader extends JdbcDataReader {
 
-    public OracleReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public OracleReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new OracleDatabaseMeta());
     }
 

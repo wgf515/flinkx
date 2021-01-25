@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.teradata.reader;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.rdb.datareader.JdbcDataReader;
 import com.dtstack.flinkx.rdb.inputformat.JdbcInputFormatBuilder;
 import com.dtstack.flinkx.teradata.TeradataDatabaseMeta;
@@ -34,8 +35,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  */
 public class TeradataReader extends JdbcDataReader {
 
-    public TeradataReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
+    public TeradataReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
         setDatabaseInterface(new TeradataDatabaseMeta());
     }
 

@@ -60,9 +60,9 @@ public class EsReader extends BaseDataReader {
     protected List<String> columnValue;
     protected List<String> columnName;
 
-    public EsReader(DataTransferConfig config, StreamExecutionEnvironment env) {
-        super(config, env);
-        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
+    public EsReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
+        super(config, readerConfig, env);
+//        ReaderConfig readerConfig = config.getJob().getContent().get(0).getReader();
         address = readerConfig.getParameter().getStringVal(EsConfigKeys.KEY_ADDRESS);
         username = readerConfig.getParameter().getStringVal(EsConfigKeys.KEY_USERNAME);
         password = readerConfig.getParameter().getStringVal(EsConfigKeys.KEY_PASSWORD);

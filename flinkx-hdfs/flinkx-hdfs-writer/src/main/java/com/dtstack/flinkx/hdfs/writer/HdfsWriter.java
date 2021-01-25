@@ -77,9 +77,9 @@ public class HdfsWriter extends BaseDataWriter {
 
     protected boolean enableDictionary;
 
-    public HdfsWriter(DataTransferConfig config) {
-        super(config);
-        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
+    public HdfsWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
+//        WriterConfig writerConfig = config.getJob().getContent().get(0).getWriter();
         hadoopConfig = (Map<String, Object>) writerConfig.getParameter().getVal(KEY_HADOOP_CONFIG);
         List columns = writerConfig.getParameter().getColumn();
         fileType = writerConfig.getParameter().getStringVal(KEY_FILE_TYPE);

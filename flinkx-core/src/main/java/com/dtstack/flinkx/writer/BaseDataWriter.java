@@ -21,6 +21,7 @@ package com.dtstack.flinkx.writer;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.DirtyConfig;
 import com.dtstack.flinkx.config.RestoreConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.reader.MetaColumn;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,7 +71,7 @@ public abstract class BaseDataWriter {
         this.srcCols = srcCols;
     }
 
-    public BaseDataWriter(DataTransferConfig config) {
+    public BaseDataWriter(DataTransferConfig config, WriterConfig writerConfig) {
         this.monitorUrls = config.getMonitorUrls();
         this.restoreConfig = config.getJob().getSetting().getRestoreConfig();
         this.errors = config.getJob().getSetting().getErrorLimit().getRecord();
@@ -91,7 +92,8 @@ public abstract class BaseDataWriter {
             }
         }
 
-        List columns = config.getJob().getContent().get(0).getReader().getParameter().getColumn();
+//        List columns = config.getJob().getContent().get(0).getReader().getParameter().getColumn();
+        List columns = writerConfig.getParameter().getColumn();
         parseSrcColumnNames(columns);
 
         if (restoreConfig.isStream()) {

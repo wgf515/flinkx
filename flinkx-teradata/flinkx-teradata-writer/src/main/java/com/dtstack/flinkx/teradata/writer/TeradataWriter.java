@@ -19,6 +19,7 @@
 package com.dtstack.flinkx.teradata.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.rdb.datawriter.JdbcDataWriter;
 import com.dtstack.flinkx.rdb.outputformat.JdbcOutputFormatBuilder;
 import com.dtstack.flinkx.teradata.TeradataDatabaseMeta;
@@ -32,8 +33,8 @@ import com.dtstack.flinkx.teradata.format.TeradataOutputFormat;
  */
 public class TeradataWriter extends JdbcDataWriter {
 
-    public TeradataWriter(DataTransferConfig config) {
-        super(config);
+    public TeradataWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         setDatabaseInterface(new TeradataDatabaseMeta());
     }
 

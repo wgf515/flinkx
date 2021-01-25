@@ -21,6 +21,7 @@ package com.dtstack.flinkx.reader;
 import com.dtstack.flinkx.classloader.ClassLoaderManager;
 import com.dtstack.flinkx.classloader.PluginUtil;
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.ReaderConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -37,9 +38,10 @@ public class DataReaderFactory {
     private DataReaderFactory() {
     }
 
-    public static BaseDataReader getDataReader(DataTransferConfig config, StreamExecutionEnvironment env) {
+    public static BaseDataReader getDataReader(DataTransferConfig config, ReaderConfig readerConfig, StreamExecutionEnvironment env) {
         try {
-            String pluginName = config.getJob().getContent().get(0).getReader().getName();
+            String pluginName = readerConfig.getName();
+//            String pluginName = config.getJob().getContent().get(0).getReader().getName();
             String pluginClassName = PluginUtil.getPluginClassName(pluginName);
             Set<URL> urlList = PluginUtil.getJarFileDirPath(pluginName, config.getPluginRoot(), config.getRemotePluginPath());
 

@@ -93,20 +93,23 @@ public class DataTransferConfig extends AbstractConfig {
         ContentConfig content =  contentConfig.get(0);
 
         // 检查reader配置
-        ReaderConfig readerConfig = content.getReader();
-        Preconditions.checkNotNull(readerConfig, "Must specify a reader element");
-        Preconditions.checkNotNull(readerConfig.getName(), "Must specify reader name");
-        ReaderConfig.ParameterConfig readerParameter = readerConfig.getParameter();
-        Preconditions.checkNotNull(readerParameter, "Must specify parameter for reader");
+        List<ReaderConfig> readerConfigs = content.getReader();
+        Preconditions.checkNotNull(readerConfigs, "Must specify a reader element");
+        for (ReaderConfig readerConfig : readerConfigs) {
+            Preconditions.checkNotNull(readerConfig.getName(), "Must specify reader name");
+            ReaderConfig.ParameterConfig readerParameter = readerConfig.getParameter();
+            Preconditions.checkNotNull(readerParameter, "Must specify parameter for reader");
+        }
 
 
         // 检查writer配置
-        WriterConfig  writerConfig = content.getWriter();
-        Preconditions.checkNotNull(writerConfig, "Must specify a writer element");
-        Preconditions.checkNotNull(writerConfig.getName(), "Must specify the writer name");
-        WriterConfig.ParameterConfig writerParameter = writerConfig.getParameter();
-        Preconditions.checkNotNull(writerParameter, "Must specify parameter for the writer");
-
+        List<WriterConfig> writerConfigs = content.getWriter();
+        Preconditions.checkNotNull(writerConfigs, "Must specify a writer element");
+        for (WriterConfig writerConfig : writerConfigs) {
+            Preconditions.checkNotNull(writerConfig.getName(), "Must specify the writer name");
+            WriterConfig.ParameterConfig writerParameter = writerConfig.getParameter();
+            Preconditions.checkNotNull(writerParameter, "Must specify parameter for the writer");
+        }
     }
 
     public static DataTransferConfig parse(String json) {

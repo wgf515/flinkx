@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.dm.writer;
 
 import com.dtstack.flinkx.config.DataTransferConfig;
+import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.dm.DmDatabaseMeta;
 import com.dtstack.flinkx.dm.format.DmOutputFormat;
 import com.dtstack.flinkx.rdb.datawriter.JdbcDataWriter;
@@ -31,8 +32,8 @@ import com.dtstack.flinkx.rdb.outputformat.JdbcOutputFormatBuilder;
  */
 public class DmWriter extends JdbcDataWriter {
 
-    public DmWriter(DataTransferConfig config) {
-        super(config);
+    public DmWriter(DataTransferConfig config, WriterConfig writerConfig) {
+        super(config, writerConfig);
         setDatabaseInterface(new DmDatabaseMeta());
     }
 
